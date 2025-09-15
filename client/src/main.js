@@ -3,21 +3,49 @@ import "./style.css";
 import { initTheme } from "./theme.js";
 import { TopNav } from "./components/TopNav.js";
 import { FeedView } from "./views/FeedView.js";
+import api from "./api.js";
 
 initTheme();
 
 const app = document.getElementById("app");
 
-function renderFeed() {
+async function renderFeed() {
   app.innerHTML = "";
   app.appendChild(TopNav({ onLogoClick: renderFeed }));
-  // Fetch posts here; for now, placeholder
-  const posts = [];
+
+  // Fetch initial data
+  let posts = [];
+  try {
+    const resp = await api.feed.list();
+    posts = resp.posts || [];
+  } catch (err) {
+    // keep posts empty on error
+    // eslint-disable-next-line no-console
+    console.error("Failed to load feed:", err);
+  }
+
   app.appendChild(
     FeedView({
       posts,
-      onLike: (id) => console.log("like", id),
+      onLike: async (id) => {
+        try {
+          await api.likes.toggle(id);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error("Like failed", e);
+        }
+      },
       onOpen: (id) => console.log("open", id),
+      onCreate: async (content) => {
+        try {
+          const res = await api.posts.create({ body: content });
+          return res.post || null;
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error("Create post failed", e);
+          return null;
+        }
+      },
     })
   );
 }
