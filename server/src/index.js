@@ -1,3 +1,12 @@
+// Load local .env (if present) so process.env is populated for config like Cloudinary
+// This is safe to call in development; in production your platform should provide env vars.
+/* eslint-disable global-require */
+try {
+  require("dotenv").config();
+} catch (e) {
+  // dotenv is optional; if not installed or fails, continue and rely on process.env
+}
+
 const http = require("http");
 
 const app = require("./app.js");

@@ -78,6 +78,8 @@ export const comments = {
 // Users
 export const users = {
   list: () => fetchJson("/api/users", { method: "GET" }).then((r) => r.users || []),
+  updateAvatar: (avatarUrl) =>
+    fetchJson("/api/users/avatar", { method: "POST", body: { avatarUrl } }),
 };
 
 // Follows
