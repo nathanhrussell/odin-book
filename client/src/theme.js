@@ -23,3 +23,18 @@ root.classList.toggle("dark", next === "dark");
 localStorage.setItem(STORAGE_KEY, next);
 return next;
 }
+
+export function ThemeButton() {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn btn-ghost";
+  btn.setAttribute("aria-label", "Toggle theme");
+  btn.innerHTML = `
+    <span aria-hidden="true">🌓</span>
+    <span class="sr-only">Toggle theme</span>
+  `;
+  btn.addEventListener("click", () => {
+    toggleTheme();
+  });
+  return btn;
+}

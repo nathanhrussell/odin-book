@@ -1,0 +1,10 @@
+{
+  "name": "odin-book",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "lint": "eslint . --ext .js,.cjs,.mjs --ignore-path .eslintignore",
+    "lint:fix": "eslint . --ext .js,.cjs,.mjs --ignore-path .eslintignore --fix"
+  },
+  "devDependencies": {}
+}
