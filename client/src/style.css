@@ -5,6 +5,8 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
+  /* Brand background used on the login view. Matches the logo container color. */
+  --brand-bg: #19202b; /* dark slate brand color */
   background-color: #242424;
 
   font-synthesis: none;

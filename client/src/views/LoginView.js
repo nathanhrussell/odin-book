@@ -4,14 +4,15 @@ import { navigate } from "../router.js";
 export function LoginView() {
   const el = document.createElement("main");
   // Full-viewport brand background, center content
-  el.className = "min-h-screen flex items-center justify-center bg-[var(--brand-bg)]";
+  // make background cover entire viewport width while keeping content centered
+  el.className = "min-h-screen w-full flex items-center justify-center bg-[#400c94]";
   el.innerHTML = `
     <div class="w-full max-w-md px-4 py-12">
       <div class="text-center mb-6">
-        <img src="/odinbooklogo.png" alt="Odin Book" class="mx-auto w-28 h-28 rounded-md mb-4" />
+  <img src="/odinbooklogo.png" alt="Odin Book" class="mx-auto w-40 h-40 rounded-md mb-4" />
         <p class="text-sm text-gray-100 mt-1">Connect. Share. Interact.</p>
       </div>
-      <section class="card card-pad card-on-brand">
+  <section class="card card-pad shadow-none" style="background-color: #400c94;">
       <h2 class="text-lg font-semibold">Sign in</h2>
       <form id="login-form" class="flex flex-col gap-4 mt-6">
         <label for="email" class="sr-only">Email</label>
