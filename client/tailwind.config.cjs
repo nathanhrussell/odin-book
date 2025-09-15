@@ -1,13 +1,15 @@
 /* eslint-env node */
+/* eslint-disable import/no-unresolved */
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 
 module.exports = {
-darkMode: "class",
-content: [
-"./client/index.html",
-"./client/src/**/*.{js,ts,html}",
-],
+	darkMode: "class",
+	content: [
+		// paths are relative to this config file (which lives in `client/`)
+		"./index.html",
+		"./src/**/*.{js,ts,html}",
+	],
 theme: {
 extend: {
 fontFamily: {
