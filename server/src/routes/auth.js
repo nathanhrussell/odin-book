@@ -1,4 +1,5 @@
 const express = require("express");
+// eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require("bcryptjs");
 
 const prisma = require("../prisma.js");

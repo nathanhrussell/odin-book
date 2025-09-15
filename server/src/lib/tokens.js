@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require("jsonwebtoken");
 
 const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "dev_access_secret";
