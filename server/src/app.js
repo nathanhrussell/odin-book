@@ -42,6 +42,7 @@ app.get("/", (req, res) => {
 // Mount auth routes
 app.use("/api/auth", require("./routes/auth.js"));
 app.use("/api/posts", require("./routes/posts.js"));
+app.use("/api/users", require("./routes/users.js"));
 
 // Error handler (should be last)
 app.use(errorHandler);
