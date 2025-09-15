@@ -8,7 +8,7 @@ export async function ProfileView({ username } = {}) {
   const header = document.createElement("header");
   header.className = "flex items-center gap-4";
   header.innerHTML = `
-    <img src="" alt="avatar" id="profile-avatar" class="w-16 h-16 rounded-full bg-gray-200"/>
+    <img src="" alt="${username} avatar" id="profile-avatar" class="w-16 h-16 rounded-full bg-gray-200"/>
     <div>
       <div id="profile-name" class="font-semibold text-lg">${username}</div>
       <div id="profile-username" class="text-sm text-gray-500">@${username}</div>
@@ -39,6 +39,8 @@ export async function ProfileView({ username } = {}) {
     filtered.forEach((p) => {
       const node = document.createElement("article");
       node.className = "card card-pad";
+      node.setAttribute("tabindex", "0");
+      node.setAttribute("aria-label", `Post by ${username}`);
       node.innerHTML = `<div class="text-sm text-gray-700">${p.body}</div>`;
       postsSection.appendChild(node);
     });

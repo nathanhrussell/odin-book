@@ -9,8 +9,10 @@ export function LoginView() {
     <section class="card card-pad">
       <h2 class="text-lg font-semibold">Sign in</h2>
       <form id="login-form" class="flex flex-col gap-3 mt-4">
-        <input name="email" type="email" placeholder="Email" class="input" required />
-        <input name="password" type="password" placeholder="Password" class="input" required />
+        <label for="email" class="sr-only">Email</label>
+        <input id="email" name="email" type="email" placeholder="Email" class="input" required autocomplete="email" autofocus />
+        <label for="password" class="sr-only">Password</label>
+        <input id="password" name="password" type="password" placeholder="Password" class="input" required autocomplete="current-password" />
         <div class="flex justify-end">
           <button class="btn btn-primary" type="submit">Sign in</button>
         </div>

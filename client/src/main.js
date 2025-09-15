@@ -34,30 +34,36 @@ addRoute("/feed", {
         container.appendChild(EmptyNode("No posts yet"));
       }
 
-      container.appendChild(
-        FeedView({
-          posts,
-          onLike: async (id) => {
-            try {
-              await api.likes.toggle(id);
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error("Like failed", e);
-            }
-          },
-          onOpen: (id) => console.log("open", id),
-          onCreate: async (content) => {
-            try {
-              const res = await api.posts.create({ body: content });
-              return res.post || null;
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error("Create post failed", e);
-              return null;
-            }
-          },
-        })
-      );
+      const feedNode = FeedView({
+        posts,
+        onLike: async (id) => {
+          try {
+            await api.likes.toggle(id);
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Like failed", e);
+          }
+        },
+        onOpen: (id) => console.log("open", id),
+        onCreate: async (content) => {
+          try {
+            const res = await api.posts.create({ body: content });
+            return res.post || null;
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Create post failed", e);
+            return null;
+          }
+        },
+      });
+      container.appendChild(feedNode);
+
+      // Accessibility: wire New Post button to focus the composer textarea
+      const newPostBtn = container.querySelector("#new-post");
+      const composerTextarea = container.querySelector("#content");
+      if (newPostBtn && composerTextarea) {
+        newPostBtn.addEventListener("click", () => composerTextarea.focus());
+      }
     } catch (err) {
       container.removeChild(loading);
       // eslint-disable-next-line no-console

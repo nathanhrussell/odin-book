@@ -7,11 +7,14 @@ export function TopNav({ onLogoClick, onProfileClick }) {
 
   el.innerHTML = `
 <div class="mx-auto max-w-2xl px-4 h-14 flex items-center justify-between">
-<button class="font-semibold tracking-tight text-primary-400 hover:text-primary-300" aria-label="Home">\n • social\n </button>
-<nav class="flex items-center gap-2">
-<button id="new-post" class="btn btn-primary text-sm">New Post</button>
-<button id="profile" class="btn btn-ghost text-sm">Profile</button>
-</nav>
+  <button class="font-semibold tracking-tight text-primary-400 hover:text-primary-300" aria-label="Home">
+    <span class="sr-only">Home</span>
+    • social
+  </button>
+  <nav class="flex items-center gap-2">
+    <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
+    <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
+  </nav>
 </div>
 `;
 

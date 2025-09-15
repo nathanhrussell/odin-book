@@ -13,6 +13,7 @@ export async function UsersView() {
 
   const list = document.createElement("section");
   list.className = "flex flex-col gap-3";
+  list.setAttribute("role", "list");
   el.appendChild(list);
 
   const loading = LoadingNode();
@@ -21,6 +22,7 @@ export async function UsersView() {
   function createRow(u) {
     const row = document.createElement("div");
     row.className = "card card-pad flex items-center justify-between";
+    row.setAttribute("role", "listitem");
     row.innerHTML = `
         <div class="flex items-center gap-3">
           <img src="${u.avatarUrl || ""}" alt="${
@@ -38,6 +40,7 @@ export async function UsersView() {
     const viewBtn = document.createElement("button");
     viewBtn.className = "btn btn-ghost text-sm";
     viewBtn.textContent = "View";
+    viewBtn.setAttribute("aria-label", `View profile of ${u.username}`);
     viewBtn.addEventListener("click", () => navigate(`/profile/${encodeURIComponent(u.username)}`));
     actions.appendChild(viewBtn);
 
@@ -47,6 +50,7 @@ export async function UsersView() {
     else if (u.followStatus === "PENDING") followBtn.textContent = "Pending";
     else followBtn.textContent = "Follow";
 
+    followBtn.setAttribute("aria-label", `${followBtn.textContent} ${u.username}`);
     followBtn.addEventListener("click", async () => {
       try {
         if (!u.followStatus) {

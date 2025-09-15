@@ -10,6 +10,9 @@ function escapeHtml(str) {
 export function PostCard(post, { onLike, onOpen }) {
   const el = document.createElement("article");
   el.className = "card card-pad flex flex-col gap-3";
+  el.setAttribute("tabindex", "0");
+  el.setAttribute("role", "article");
+  el.setAttribute("aria-label", `Post by ${post.author.name}`);
   el.innerHTML = `
     <header class="flex items-center gap-3">
       <img src="${post.author.avatar}" alt="${post.author.name}" class="w-10 h-10 rounded-full"/>
@@ -48,10 +51,11 @@ export function FeedView({ posts = [], onLike, onOpen, onCreate }) {
   composer.innerHTML = `
     <img src="" alt="" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800" id="me-avatar"/>
     <form id="composer" class="flex-1 flex flex-col gap-3">
-      <textarea class="textarea" id="content" placeholder="What’s happening?" maxlength="500"></textarea>
+      <label for="content" class="sr-only">Post content</label>
+      <textarea class="textarea" id="content" placeholder="What’s happening?" maxlength="500" aria-label="Post content"></textarea>
       <div class="flex items-center justify-between">
         <span class="text-xs text-gray-500"><span id="char-count">0</span>/500</span>
-        <button class="btn btn-primary" type="submit">Post</button>
+        <button class="btn btn-primary" type="submit" aria-label="Submit post">Post</button>
       </div>
     </form>
   `;
