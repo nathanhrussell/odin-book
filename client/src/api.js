@@ -22,11 +22,12 @@ async function fetchJson(path, opts = {}) {
     payload = text ? JSON.parse(text) : null;
   } catch (err) {
     // Non-JSON response
-  throw new Error(`Unexpected response: ${text}`);
+    throw new Error(`Unexpected response: ${text}`);
   }
 
   if (!res.ok) {
-    const message = (payload && payload.error && payload.error.message) || payload || res.statusText;
+    const message =
+      (payload && payload.error && payload.error.message) || payload || res.statusText;
     const err = new Error(message);
     err.status = res.status;
     err.payload = payload;
@@ -57,8 +58,8 @@ export const feed = {
     const params = new URLSearchParams();
     if (limit) params.set("limit", String(limit));
     if (cursor) params.set("cursor", cursor);
-  const qs = params.toString() ? `?${params.toString()}` : "";
-  return fetchJson(`/api/feed${qs}`, { method: "GET" });
+    const qs = params.toString() ? `?${params.toString()}` : "";
+    return fetchJson(`/api/feed${qs}`, { method: "GET" });
   },
 };
 
@@ -69,7 +70,8 @@ export const likes = {
 
 // Comments
 export const comments = {
-  list: (postId) => fetchJson(`/api/comments?postId=${postId}`, { method: "GET" }).then((r) => r.comments || []),
+  list: (postId) =>
+    fetchJson(`/api/comments?postId=${postId}`, { method: "GET" }).then((r) => r.comments || []),
   create: (postId, body) => fetchJson("/api/comments", { method: "POST", body: { postId, body } }),
 };
 
