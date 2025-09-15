@@ -22,17 +22,30 @@ export function toggleTheme() {
   return next;
 }
 
+export function getTheme() {
+  return document.documentElement.classList.contains("dark") ? "dark" : "light";
+}
+
 export function ThemeButton() {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "btn btn-ghost";
   btn.setAttribute("aria-label", "Toggle theme");
-  btn.innerHTML = `
-    <span aria-hidden="true">🌓</span>
-    <span class="sr-only">Toggle theme</span>
-  `;
+  function update() {
+    const current = getTheme();
+    btn.setAttribute("aria-pressed", current === "dark" ? "true" : "false");
+    btn.innerHTML = `
+      <span aria-hidden="true">${current === "dark" ? "�" : "☀️"}</span>
+      <span class="sr-only">Toggle theme, current: ${current}</span>
+    `;
+  }
+
   btn.addEventListener("click", () => {
     toggleTheme();
+    update();
   });
+
+  // Initialize visual state
+  update();
   return btn;
 }
