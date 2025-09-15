@@ -5,7 +5,10 @@ export function LoginView() {
   const el = document.createElement("main");
   // Full-viewport brand background, center content
   // make background cover entire viewport width while keeping content centered
-  el.className = "min-h-screen w-full flex items-center justify-center bg-[#400c94]";
+  el.className = "min-h-screen w-full flex items-center justify-center";
+
+  // Set the body background color to #400c94 for full viewport coverage
+  document.body.style.backgroundColor = "#400c94";
   el.innerHTML = `
     <div class="w-full max-w-md px-4 py-12">
       <div class="text-center mb-6">
