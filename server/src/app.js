@@ -39,7 +39,8 @@ app.get("/", (req, res) => {
   res.json({ status: "ok", message: "Server workspace initialized" });
 });
 
-// ... mount routes here in future, e.g. app.use('/api/auth', require('./routes/auth'))
+// Mount auth routes
+app.use("/api/auth", require("./routes/auth.js"));
 
 // Error handler (should be last)
 app.use(errorHandler);
