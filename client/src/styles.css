@@ -11,7 +11,7 @@
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   /* Brand background used on the login view. Matches the logo container color. */
-  --brand-bg: #400c94; /* purple brand color from logo */
+  --brand-bg: #6b4cad; /* purple brand color from logo */
   background-color: #242424;
 
   font-synthesis: none;
@@ -124,7 +124,7 @@ button:focus-visible {
   .card-on-brand {
     /* slightly translucent panel on top of the brand background */
     background-color: color-mix(in srgb, var(--brand-bg) 80%, white 20%);
-    border: 1px solid rgba(255,255,255,0.04);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     color: #fff;
   }
   .card-pad {

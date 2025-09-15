@@ -8,25 +8,24 @@ export function LoginView() {
   el.className = "min-h-screen w-full flex items-center justify-center";
 
   // Set the body background color to #400c94 for full viewport coverage
-  document.body.style.backgroundColor = "#400c94";
+  document.body.style.backgroundColor = "#6B4CAD";
   el.innerHTML = `
-    <div class="w-full max-w-md px-4 py-12">
-      <div class="text-center mb-6">
-  <img src="/odinbooklogo.png" alt="Odin Book" class="mx-auto w-40 h-40 rounded-md mb-4" />
-        <p class="text-sm text-gray-100 mt-1">Connect. Share. Interact.</p>
+    <div class="w-full max-w-xl px-4 py-24">
+      <div class="text-center mb-12">
+        <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto w-72 h-72 rounded-lg mb-8" />
+        <p class="text-2xl font-semibold text-gray-100 mt-2">Connect. Share. Interact.</p>
       </div>
-  <section class="card card-pad shadow-none" style="background-color: #400c94;">
-      <h2 class="text-lg font-semibold">Sign in</h2>
-      <form id="login-form" class="flex flex-col gap-4 mt-6">
-        <label for="email" class="sr-only">Email</label>
-        <input id="email" name="email" type="email" placeholder="Email" class="input" required autocomplete="email" autofocus />
-        <label for="password" class="sr-only">Password</label>
-        <input id="password" name="password" type="password" placeholder="Password" class="input" required autocomplete="current-password" />
-        <div class="flex justify-center mt-8">
-          <button class="btn btn-on-brand px-8 py-3 text-base" type="submit">Sign in</button>
-        </div>
-      </form>
-    </section>
+  <section class="card card-pad shadow-none border-none" style="background-color: #6B4CAD; border: none;">
+        <form id="login-form" class="flex flex-col gap-6 mt-6">
+          <label for="email" class="sr-only">Email</label>
+          <input id="email" name="email" type="email" placeholder="Email" class="input text-lg py-4" required autocomplete="email" autofocus />
+          <label for="password" class="sr-only">Password</label>
+          <input id="password" name="password" type="password" placeholder="Password" class="input text-lg py-4" required autocomplete="current-password" />
+          <div class="flex justify-center mt-10">
+            <button class="btn btn-on-brand px-12 py-4 text-xl font-semibold" type="submit">Sign In</button>
+          </div>
+        </form>
+      </section>
     </div>
   `;
 
