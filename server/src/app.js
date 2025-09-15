@@ -43,6 +43,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", require("./routes/auth.js"));
 app.use("/api/posts", require("./routes/posts.js"));
 app.use("/api/users", require("./routes/users.js"));
+app.use("/api/follows", require("./routes/follows.js"));
 
 // Error handler (should be last)
 app.use(errorHandler);
