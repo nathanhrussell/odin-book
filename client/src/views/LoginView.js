@@ -1,4 +1,5 @@
 import api from "../api.js";
+import { navigate } from "../router.js";
 
 export function LoginView() {
   const el = document.createElement("main");
@@ -24,15 +25,24 @@ export function LoginView() {
     const email = data.get("email");
     const password = data.get("password");
 
+    const errBoxId = "login-error";
+    let errBox = el.querySelector(`#${errBoxId}`);
+    if (!errBox) {
+      errBox = document.createElement("div");
+      errBox.id = errBoxId;
+      errBox.className = "text-sm text-red-500";
+      form.prepend(errBox);
+    }
+
     try {
       await api.auth.login({ email, password });
       // On success navigate to feed
-      location.hash = "#/feed";
+      navigate("/feed");
     } catch (err) {
       // Minimal inline error handling
       // eslint-disable-next-line no-console
       console.error("Login failed", err);
-      alert((err && err.message) || "Login failed");
+      errBox.textContent = (err && err.message) || "Login failed";
     }
   });
 

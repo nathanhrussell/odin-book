@@ -6,6 +6,8 @@ import { FeedView } from "./views/FeedView.js";
 import api from "./api.js";
 import { addRoute, start as startRouter, navigate } from "./router.js";
 import { LoginView } from "./views/LoginView.js";
+import { UsersView } from "./views/UsersView.js";
+import { ProfileView } from "./views/ProfileView.js";
 
 initTheme();
 
@@ -61,6 +63,28 @@ addRoute("/login", {
   render: async () => {
     const container = document.createElement("div");
     container.appendChild(LoginView());
+    return container;
+  },
+});
+
+addRoute("/users", {
+  requiresAuth: true,
+  render: async () => {
+    const container = document.createElement("div");
+    container.appendChild(TopNav({ onLogoClick: () => navigate("/feed") }));
+    const node = await UsersView();
+    container.appendChild(node);
+    return container;
+  },
+});
+
+addRoute("/profile/:username", {
+  requiresAuth: true,
+  render: async (params) => {
+    const container = document.createElement("div");
+    container.appendChild(TopNav({ onLogoClick: () => navigate("/feed") }));
+    const node = await ProfileView({ username: params.username });
+    container.appendChild(node);
     return container;
   },
 });
