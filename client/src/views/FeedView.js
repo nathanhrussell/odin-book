@@ -3,7 +3,7 @@ function escapeHtml(str) {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
-    .replaceAll("\"", "&quot;")
+    .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
 
@@ -20,8 +20,12 @@ export function PostCard(post, { onLike, onOpen }) {
     </header>
     <p class="text-[15px] leading-6">${escapeHtml(post.content)}</p>
     <footer class="flex items-center gap-3 text-sm">
-      <button class="btn btn-ghost" data-like aria-label="Like post">♡ <span>${post.likesCount ?? 0}</span></button>
-      <button class="btn btn-ghost" data-open aria-label="Open comments">💬 <span>${post.commentsCount ?? 0}</span></button>
+      <button class="btn btn-ghost" data-like aria-label="Like post">♡ <span>${
+        post.likesCount ?? 0
+      }</span></button>
+      <button class="btn btn-ghost" data-open aria-label="Open comments">💬 <span>${
+        post.commentsCount ?? 0
+      }</span></button>
     </footer>
   `;
 

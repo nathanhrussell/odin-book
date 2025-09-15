@@ -3,8 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "format": "prettier --write \"**/*.{js,css,html}\"",
     "lint": "eslint . --ext .js,.cjs,.mjs --ignore-path .eslintignore",
-    "lint:fix": "eslint . --ext .js,.cjs,.mjs --ignore-path .eslintignore --fix"
+    "lint:fix": "eslint . --ext .js,.cjs,.mjs --ignore-path .eslintignore --fix",
+    "smoke-fix": "npm run format && npm run lint:fix"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^2.0.0",
+    "eslint-config-prettier": "^8.0.0",
+    "eslint-plugin-prettier": "^4.0.0"
+  }
 }
