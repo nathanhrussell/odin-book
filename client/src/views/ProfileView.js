@@ -1,4 +1,5 @@
 import api from "../api.js";
+import { LoadingNode, EmptyNode, ErrorNode } from "../components/Status.js";
 
 export async function ProfileView({ username } = {}) {
   const el = document.createElement("main");
@@ -20,28 +21,32 @@ export async function ProfileView({ username } = {}) {
   postsSection.className = "flex flex-col gap-4 mt-4";
   el.appendChild(postsSection);
 
+  const loading = LoadingNode();
+  postsSection.appendChild(loading);
+
   try {
-    // There is no dedicated API for user profile + posts; get all posts and filter by author.username
     const resp = await api.posts.list();
     const posts = Array.isArray(resp) ? resp : resp.posts || [];
-
-    // Filter by author username
     const filtered = posts.filter((p) => p.author && p.author.username === username);
 
+    postsSection.removeChild(loading);
+
     if (!filtered.length) {
-      postsSection.appendChild(document.createTextNode("No posts yet"));
-    } else {
-      filtered.forEach((p) => {
-        const node = document.createElement("article");
-        node.className = "card card-pad";
-        node.innerHTML = `<div class="text-sm text-gray-700">${p.body}</div>`;
-        postsSection.appendChild(node);
-      });
+      postsSection.appendChild(EmptyNode("No posts yet"));
+      return el;
     }
+
+    filtered.forEach((p) => {
+      const node = document.createElement("article");
+      node.className = "card card-pad";
+      node.innerHTML = `<div class="text-sm text-gray-700">${p.body}</div>`;
+      postsSection.appendChild(node);
+    });
   } catch (err) {
+    postsSection.removeChild(loading);
     // eslint-disable-next-line no-console
     console.error("Failed to load profile posts", err);
-    postsSection.appendChild(document.createTextNode("Failed to load posts"));
+    postsSection.appendChild(ErrorNode((err && err.message) || "Failed to load posts"));
   }
 
   return el;

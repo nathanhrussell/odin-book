@@ -1,5 +1,6 @@
 import api from "../api.js";
 import { navigate } from "../router.js";
+import { LoadingNode, EmptyNode, ErrorNode } from "../components/Status.js";
 
 export async function UsersView() {
   const el = document.createElement("main");
@@ -13,6 +14,9 @@ export async function UsersView() {
   const list = document.createElement("section");
   list.className = "flex flex-col gap-3";
   el.appendChild(list);
+
+  const loading = LoadingNode();
+  list.appendChild(loading);
 
   function createRow(u) {
     const row = document.createElement("div");
@@ -72,11 +76,17 @@ export async function UsersView() {
 
   try {
     const users = await api.users.list();
+    list.removeChild(loading);
+    if (!users.length) {
+      list.appendChild(EmptyNode("No users"));
+      return el;
+    }
     users.forEach((u) => list.appendChild(createRow(u)));
   } catch (err) {
+    list.removeChild(loading);
     // eslint-disable-next-line no-console
     console.error("Failed to load users", err);
-    el.appendChild(document.createTextNode("Failed to load users"));
+    list.appendChild(ErrorNode((err && err.message) || "Failed to load users"));
   }
 
   return el;

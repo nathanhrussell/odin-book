@@ -8,6 +8,7 @@ import { addRoute, start as startRouter, navigate } from "./router.js";
 import { LoginView } from "./views/LoginView.js";
 import { UsersView } from "./views/UsersView.js";
 import { ProfileView } from "./views/ProfileView.js";
+import { LoadingNode, EmptyNode, ErrorNode } from "./components/Status.js";
 
 initTheme();
 
@@ -20,39 +21,49 @@ addRoute("/feed", {
     const container = document.createElement("div");
     container.appendChild(TopNav({ onLogoClick: () => navigate("/feed") }));
 
-    let posts = [];
+    // Show loading state while fetching feed
+    const loading = LoadingNode();
+    container.appendChild(loading);
+
     try {
       const resp = await api.feed.list();
-      posts = resp.posts || [];
+      const posts = resp.posts || [];
+      container.removeChild(loading);
+
+      if (!posts.length) {
+        container.appendChild(EmptyNode("No posts yet"));
+      }
+
+      container.appendChild(
+        FeedView({
+          posts,
+          onLike: async (id) => {
+            try {
+              await api.likes.toggle(id);
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error("Like failed", e);
+            }
+          },
+          onOpen: (id) => console.log("open", id),
+          onCreate: async (content) => {
+            try {
+              const res = await api.posts.create({ body: content });
+              return res.post || null;
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error("Create post failed", e);
+              return null;
+            }
+          },
+        })
+      );
     } catch (err) {
+      container.removeChild(loading);
       // eslint-disable-next-line no-console
       console.error("Failed to load feed:", err);
+      container.appendChild(ErrorNode((err && err.message) || "Failed to load feed"));
     }
-
-    container.appendChild(
-      FeedView({
-        posts,
-        onLike: async (id) => {
-          try {
-            await api.likes.toggle(id);
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error("Like failed", e);
-          }
-        },
-        onOpen: (id) => console.log("open", id),
-        onCreate: async (content) => {
-          try {
-            const res = await api.posts.create({ body: content });
-            return res.post || null;
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error("Create post failed", e);
-            return null;
-          }
-        },
-      })
-    );
 
     return container;
   },
