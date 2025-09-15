@@ -1,5 +1,4 @@
 import "./styles.css";
-import "./style.css";
 import { initTheme } from "./theme.js";
 import { TopNav } from "./components/TopNav.js";
 import { FeedView } from "./views/FeedView.js";
