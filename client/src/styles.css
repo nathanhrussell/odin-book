@@ -8,6 +8,9 @@
   line-height: 1.5;
   font-weight: 400;
 
+  /* Increase base font size so the UI scales up on desktop (was feeling very small) */
+  font-size: 18px;
+
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   /* Brand background used on the login view. Matches the logo container color. */
@@ -31,8 +34,8 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* Use normal flow rather than centering the entire body to avoid smartphone-like layout */
+  display: block;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -43,10 +46,12 @@ h1 {
 }
 
 #app {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  /* Increase padding so elements have horizontal breathing room (addresses the red Xs)
+     and make things feel less cramped */
+  padding: 2.5rem;
+  text-align: left;
 }
 
 .logo {
