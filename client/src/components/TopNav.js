@@ -24,14 +24,14 @@ export function TopNav({ onLogoClick, onProfileClick }) {
 
     el.className = "sticky top-0 z-40 left-0 right-0";
     el.innerHTML = `
-      <div style="background-color: #6B4CAD; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); width: 100vw;">
-        <div class="mx-auto max-w-4xl px-6 py-6 flex items-center justify-center">
+      <div style="background-color: #6B4CAD; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); width: 100vw; margin-top: calc(-2.5rem);">
+        <div class="mx-auto max-w-4xl px-6 py-8 flex items-center justify-center">
           <button aria-label="Home" class="mx-auto">
-            <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto h-36" />
+            <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto h-48" />
           </button>
         </div>
       </div>
-      <div class="mx-auto max-w-4xl px-6 h-12 flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-transparent dark:bg-gray-900">
+      <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-transparent dark:bg-gray-900">
         <div class="flex items-center gap-3">
           <button class="flex items-center gap-3" aria-label="Home">
             <img src="/odinbooklogovector.svg" alt="Odin Book logo" class="w-12 h-12 rounded-md block"/>
@@ -140,12 +140,12 @@ export function TopNav({ onLogoClick, onProfileClick }) {
       }
       el.className = "sticky top-0 z-40 left-0 right-0";
       el.innerHTML = `
-        <div style="background-color: #6B4CAD; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); width: 100vw;">
-          <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-center">
-            <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto h-28" />
+        <div style="background-color: #6B4CAD; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); width: 100vw; margin-top: calc(-2.5rem);">
+          <div class="mx-auto max-w-4xl px-6 py-8 flex items-center justify-center">
+            <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto h-48" />
           </div>
         </div>
-        <div class="mx-auto max-w-4xl px-6 h-12 flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-transparent dark:bg-gray-900">
+        <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-transparent dark:bg-gray-900">
           <div class="flex items-center gap-3"></div>
           <nav class="flex items-center gap-3">
             <!-- theme + auth inserted below -->
