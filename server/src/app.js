@@ -44,8 +44,6 @@ app.use("/api/auth", require("./routes/auth.js"));
 app.use("/api/posts", require("./routes/posts.js"));
 app.use("/api/users", require("./routes/users.js"));
 app.use("/api/follows", require("./routes/follows.js"));
-app.use("/api/likes", require("./routes/likes.js"));
-app.use("/api/comments", require("./routes/comments.js"));
 app.use("/api/feed", require("./routes/feed.js"));
 
 // If an unknown /api route is requested, return JSON 404 instead of HTML

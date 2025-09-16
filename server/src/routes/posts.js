@@ -37,23 +37,35 @@ router.post("/", requireAuth, async (req, res, next) => {
 });
 
 // Protected: delete a post (only by owner)
+// Add logging to debug the DELETE /:id route
 router.delete("/:id", requireAuth, async (req, res, next) => {
+  console.log("DELETE request received for post ID:", req.params.id);
   try {
     const id = Number(req.params.id);
-    if (!id) return res.status(400).json({ error: { message: "Invalid post id" } });
+    if (!id) {
+      console.log("Invalid post ID:", req.params.id);
+      return res.status(400).json({ error: { message: "Invalid post id" } });
+    }
 
     const existing = await prisma.post.findUnique({ where: { id } });
-    if (!existing) return res.status(404).json({ error: { message: "Post not found" } });
-    if (existing.authorId !== req.user.id)
+    if (!existing) {
+      console.log("Post not found for ID:", id);
+      return res.status(404).json({ error: { message: "Post not found" } });
+    }
+    if (existing.authorId !== req.user.id) {
+      console.log("Not authorized to delete post ID:", id);
       return res.status(403).json({ error: { message: "Not authorized" } });
+    }
 
     // Delete dependent comments and likes first (schema doesn't specify cascade)
     await prisma.comment.deleteMany({ where: { postId: id } });
     await prisma.like.deleteMany({ where: { postId: id } });
     await prisma.post.delete({ where: { id } });
 
+    console.log("Successfully deleted post ID:", id);
     return res.json({ success: true });
   } catch (err) {
+    console.error("Error handling DELETE request for post ID:", req.params.id, err);
     return next(err);
   }
 });
