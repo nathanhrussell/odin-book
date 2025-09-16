@@ -15,6 +15,7 @@ export async function ProfileView({ username } = {}) {
     <div>
       <div id="profile-name" class="font-semibold text-lg">${username}</div>
       <div id="profile-username" class="text-sm text-gray-500">@${username}</div>
+      <div id="profile-bio" class="text-sm text-gray-700 mt-1"></div>
     </div>
   `;
 
@@ -34,6 +35,7 @@ export async function ProfileView({ username } = {}) {
   el.appendChild(avatarControls);
 
   const avatarImg = header.querySelector("#profile-avatar");
+  const bioNode = header.querySelector("#profile-bio");
   const fileInput = avatarControls.querySelector("#avatar-file");
   const urlInput = avatarControls.querySelector("#avatar-url");
   const setUrlBtn = avatarControls.querySelector("#avatar-set-url");
@@ -63,6 +65,53 @@ export async function ProfileView({ username } = {}) {
   const errBox = document.createElement("div");
   errBox.className = "text-sm text-red-500 mt-2";
   avatarControls.appendChild(errBox);
+
+  // Bio edit controls (shown only if viewing your own profile)
+  const bioControls = document.createElement("div");
+  bioControls.className = "flex flex-col gap-2 mt-3";
+  bioControls.innerHTML = `
+    <textarea id="bio-input" rows="3" class="textarea textarea-sm" placeholder="Add a short bio"></textarea>
+    <div class="flex gap-2">
+      <button id="bio-save" class="btn btn-primary btn-sm">Save bio</button>
+      <button id="bio-cancel" class="btn btn-ghost btn-sm">Cancel</button>
+    </div>
+  `;
+  bioControls.style.display = "none";
+  el.appendChild(bioControls);
+
+  const bioInput = bioControls.querySelector("#bio-input");
+  const bioSave = bioControls.querySelector("#bio-save");
+  const bioCancel = bioControls.querySelector("#bio-cancel");
+  // Hook up bio save/cancel
+  bioSave.addEventListener("click", async () => {
+    const newBio = bioInput.value.trim();
+    bioSave.disabled = true;
+    try {
+      const data = await api.users.updateProfile({ bio: newBio });
+      const updated = data && data.user;
+      if (updated) {
+        bioNode.textContent = updated.bio || "";
+        // Refresh global session cache so TopNav picks up new bio/avatar if needed
+        try {
+          // Lazy import to avoid circulars
+          const session = await import("../session.js");
+          if (session && session.fetchCurrentUser) await session.fetchCurrentUser();
+        } catch (e) {
+          // ignore
+        }
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to save bio", err);
+      errBox.textContent = (err && err.message) || "Failed to save bio";
+    } finally {
+      bioSave.disabled = false;
+    }
+  });
+
+  bioCancel.addEventListener("click", () => {
+    bioInput.value = bioNode.textContent || "";
+  });
 
   setUrlBtn.addEventListener("click", async () => {
     const val = urlInput.value.trim();
@@ -156,6 +205,10 @@ export async function ProfileView({ username } = {}) {
     const meUser = meResp && meResp.user;
     if (meUser && meUser.username === username && meUser.avatarUrl) {
       avatarImg.src = avatarSrc(meUser.avatarUrl);
+      if (meUser.bio) bioNode.textContent = meUser.bio;
+      // viewing own profile: show edit controls
+      bioControls.style.display = "block";
+      bioInput.value = meUser.bio || "";
     }
   } catch (e) {
     // ignore: not logged in or me() failed
@@ -173,6 +226,14 @@ export async function ProfileView({ username } = {}) {
       const firstAuthor = filtered[0].author;
       if (firstAuthor && firstAuthor.avatarUrl) {
         avatarImg.src = avatarSrc(firstAuthor.avatarUrl);
+      }
+    }
+
+    // If the profile has no bio yet, try to read it from the post author info
+    if ((!bioNode.textContent || bioNode.textContent.trim() === "") && filtered.length) {
+      const firstAuthor = filtered[0].author;
+      if (firstAuthor && firstAuthor.bio) {
+        bioNode.textContent = firstAuthor.bio;
       }
     }
 

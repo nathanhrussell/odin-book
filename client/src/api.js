@@ -117,6 +117,8 @@ export const users = {
     fetchJson("/api/users/avatar", { method: "POST", body: { avatarUrl } }),
   // Upload a FormData containing a 'file' field to the server upload endpoint
   uploadAvatarFile: (formData) => uploadForm("/api/users/avatar/upload", formData),
+  // Update profile fields (bio, name, etc.)
+  updateProfile: (data) => fetchJson("/api/users/profile", { method: "POST", body: data }),
 };
 
 // Follows

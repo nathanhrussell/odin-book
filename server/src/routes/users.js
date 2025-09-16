@@ -112,4 +112,21 @@ router.post("/avatar", requireAuth, async (req, res, next) => {
   }
 });
 
+// Update profile fields (e.g., bio)
+router.post("/profile", requireAuth, async (req, res, next) => {
+  try {
+    const { bio } = req.body;
+
+    const updated = await prisma.user.update({
+      where: { id: req.user.id },
+      data: { bio },
+      select: { id: true, bio: true, avatarUrl: true, username: true, name: true },
+    });
+
+    return res.json({ user: updated });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 module.exports = router;
