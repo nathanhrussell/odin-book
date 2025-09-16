@@ -9,6 +9,7 @@ import { SignupView } from "../views/SignupView.js";
 import { UsersView } from "./views/UsersView.js";
 import { ProfileView } from "./views/ProfileView.js";
 import { LoadingNode, EmptyNode, ErrorNode } from "./components/Status.js";
+import { fetchCurrentUser } from "./session.js";
 
 addRoute("/signup", {
   requiresAuth: false,
@@ -20,6 +21,8 @@ addRoute("/signup", {
 });
 
 initTheme();
+// Preload current user session (optional) so UI can use cached value
+fetchCurrentUser().catch(() => {});
 
 const app = document.getElementById("app");
 
