@@ -39,6 +39,11 @@ export async function ProfileView({ username } = {}) {
   const setUrlBtn = avatarControls.querySelector("#avatar-set-url");
   const uploadBtn = avatarControls.querySelector("#avatar-upload");
   const fileInfo = avatarControls.querySelector("#avatar-file-info");
+  // Create a small preview element that shows the selected image without replacing the main avatar
+  const previewImg = document.createElement("img");
+  previewImg.id = "avatar-preview";
+  previewImg.className = "w-12 h-12 rounded-full bg-gray-100 ml-2 object-cover hidden";
+  avatarControls.appendChild(previewImg);
 
   // Helper to update avatar locally after server update
   async function setAvatarUrl(avatarUrl) {
@@ -67,20 +72,26 @@ export async function ProfileView({ username } = {}) {
   });
 
   // Upload to Cloudinary (direct) if env variable set, otherwise fallback to server-side upload
-  // Show preview/filename when a file is selected
+  // Show preview/filename when a file is selected. Do NOT replace the main avatar image
   fileInput.addEventListener("change", () => {
     const f = fileInput.files && fileInput.files[0];
     if (!f) {
       fileInfo.textContent = "";
+      previewImg.classList.add("hidden");
+      previewImg.src = "";
       return;
     }
     fileInfo.textContent = `${f.name} (${Math.round(f.size / 1024)} KB)`;
-    // show small preview
+    // show small preview without changing the main avatar
     if (f.type && f.type.startsWith("image/")) {
       const url = URL.createObjectURL(f);
-      avatarImg.src = url;
-      // revoke after image loads
-      avatarImg.onload = () => URL.revokeObjectURL(url);
+      previewImg.src = url;
+      previewImg.classList.remove("hidden");
+      // Revoke object URL after the preview loads
+      previewImg.onload = () => URL.revokeObjectURL(url);
+    } else {
+      previewImg.classList.add("hidden");
+      previewImg.src = "";
     }
   });
 
