@@ -29,6 +29,7 @@ export async function ProfileView({ username } = {}) {
     <input id="avatar-url" type="url" placeholder="Or paste image URL" class="input input-sm" />
     <button id="avatar-set-url" class="btn btn-primary btn-sm">Set URL</button>
     <button id="avatar-upload" class="btn btn-primary btn-sm">Upload</button>
+    <div id="avatar-file-info" class="text-sm text-gray-600 ml-2"></div>
   `;
   el.appendChild(avatarControls);
 
@@ -37,6 +38,7 @@ export async function ProfileView({ username } = {}) {
   const urlInput = avatarControls.querySelector("#avatar-url");
   const setUrlBtn = avatarControls.querySelector("#avatar-set-url");
   const uploadBtn = avatarControls.querySelector("#avatar-upload");
+  const fileInfo = avatarControls.querySelector("#avatar-file-info");
 
   // Helper to update avatar locally after server update
   async function setAvatarUrl(avatarUrl) {
@@ -65,6 +67,23 @@ export async function ProfileView({ username } = {}) {
   });
 
   // Upload to Cloudinary (direct) if env variable set, otherwise fallback to server-side upload
+  // Show preview/filename when a file is selected
+  fileInput.addEventListener("change", () => {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) {
+      fileInfo.textContent = "";
+      return;
+    }
+    fileInfo.textContent = `${f.name} (${Math.round(f.size / 1024)} KB)`;
+    // show small preview
+    if (f.type && f.type.startsWith("image/")) {
+      const url = URL.createObjectURL(f);
+      avatarImg.src = url;
+      // revoke after image loads
+      avatarImg.onload = () => URL.revokeObjectURL(url);
+    }
+  });
+
   uploadBtn.addEventListener("click", async () => {
     const file = fileInput.files && fileInput.files[0];
     if (!file) {
@@ -78,35 +97,37 @@ export async function ProfileView({ username } = {}) {
       if (cloudUrl) {
         const fd = new FormData();
         fd.append("file", file);
-        // Optionally include upload preset if provided
         const preset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
         if (preset) fd.append("upload_preset", preset);
 
         const resp = await fetch(cloudUrl, { method: "POST", body: fd });
-        const data = await resp.json();
+        const text = await resp.text();
+        let data = null;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch (e) {
+          throw new Error("Upload failed (invalid response)");
+        }
         const secure = data.secure_url || data.url;
         if (!secure) throw new Error("Upload failed");
         await setAvatarUrl(secure);
       } else {
-        // Fallback: upload to server which will forward to Cloudinary
         const fd = new FormData();
         fd.append("file", file);
-        const resp = await fetch("/api/users/avatar/upload", {
-          method: "POST",
-          credentials: "include",
-          body: fd,
-        });
-        const data = await resp.json();
-        if (!resp.ok)
-          throw new Error((data && data.error && data.error.message) || resp.statusText);
-        const secure = data.user && data.user.avatarUrl;
+        // Use the api helper which points at the API origin (not vite dev server)
+        const data = await api.users.uploadAvatarFile(fd);
+        const secure = data && data.user && data.user.avatarUrl;
         if (!secure) throw new Error("Upload failed");
         avatarImg.src = secure;
       }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Upload failed", err);
-      errBox.textContent = (err && err.message) || "Upload failed";
+      if (err && err.status === 404) {
+        errBox.textContent = "Upload endpoint not found (is the server running?)";
+      } else {
+        errBox.textContent = (err && err.message) || "Upload failed";
+      }
     } finally {
       uploadBtn.disabled = false;
     }

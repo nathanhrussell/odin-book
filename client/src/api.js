@@ -37,6 +37,41 @@ async function fetchJson(path, opts = {}) {
   return payload;
 }
 
+// Helper for multipart form uploads (no JSON encoding, leaves Content-Type unset)
+async function uploadForm(path, formData, opts = {}) {
+  const url = `${API_BASE}${path}`;
+  const options = {
+    method: opts.method || "POST",
+    credentials: "include",
+    body: formData,
+    // Don't set Content-Type; browser will set multipart/form-data boundary
+    ...opts,
+  };
+
+  const res = await fetch(url, options);
+
+  // Try to parse JSON if present, but tolerate empty/non-JSON responses
+  const text = await res.text();
+  let payload = null;
+  try {
+    payload = text ? JSON.parse(text) : null;
+  } catch (err) {
+    // Non-JSON response: treat as null payload but preserve status
+    payload = null;
+  }
+
+  if (!res.ok) {
+    const message =
+      (payload && payload.error && payload.error.message) || payload || res.statusText;
+    const err = new Error(message || `HTTP ${res.status}`);
+    err.status = res.status;
+    err.payload = payload;
+    throw err;
+  }
+
+  return payload;
+}
+
 // Auth
 export const auth = {
   register: (data) => fetchJson("/api/auth/register", { method: "POST", body: data }),
@@ -80,6 +115,8 @@ export const users = {
   list: () => fetchJson("/api/users", { method: "GET" }).then((r) => r.users || []),
   updateAvatar: (avatarUrl) =>
     fetchJson("/api/users/avatar", { method: "POST", body: { avatarUrl } }),
+  // Upload a FormData containing a 'file' field to the server upload endpoint
+  uploadAvatarFile: (formData) => uploadForm("/api/users/avatar/upload", formData),
 };
 
 // Follows
