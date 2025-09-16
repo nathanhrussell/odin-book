@@ -114,6 +114,11 @@ export const comments = {
 // Users
 export const users = {
   list: () => fetchJson("/api/users", { method: "GET" }).then((r) => r.users || []),
+  // Fetch public profile for a username (no auth required)
+  get: (username) =>
+    fetchJson(`/api/users/${encodeURIComponent(username)}`, { method: "GET" }).then(
+      (r) => r.user || null
+    ),
   updateAvatar: (avatarUrl) =>
     fetchJson("/api/users/avatar", { method: "POST", body: { avatarUrl } }),
   // Upload a FormData containing a 'file' field to the server upload endpoint

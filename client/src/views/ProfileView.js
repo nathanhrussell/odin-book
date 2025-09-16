@@ -389,6 +389,28 @@ export async function ProfileView({ username } = {}) {
       }
     }
 
+    // Ensure bios appear when viewing other users' profiles
+    if (!isOwnProfile && !bioNode.textContent.trim()) {
+      try {
+        // Try fetching public profile for this username
+        const userData = await users.get(username);
+        if (userData) {
+          if (userData.bio) bioNode.textContent = userData.bio;
+          if (
+            (!avatarImg.src || avatarImg.src.endsWith("default-avatar.svg")) &&
+            userData.avatarUrl
+          ) {
+            avatarImg.src = avatarSrc(userData.avatarUrl);
+          }
+          if (!nameNode.textContent && userData.name) nameNode.textContent = userData.name;
+        } else {
+          // Fallback: try to infer bio from post author already handled above
+        }
+      } catch (err) {
+        // ignore: users.get may fail if server unreachable or other error
+      }
+    }
+
     if (!filtered.length) {
       postsSection.appendChild(EmptyNode("No posts yet"));
       return el;

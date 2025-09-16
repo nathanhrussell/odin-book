@@ -70,7 +70,7 @@ router.get("/", requireAuth, async (req, res, next) => {
     // Get all users except current
     const users = await prisma.user.findMany({
       where: { id: { not: currentUserId } },
-      select: { id: true, username: true, name: true, avatarUrl: true },
+      select: { id: true, username: true, name: true, avatarUrl: true, bio: true },
       orderBy: { username: "asc" },
     });
 
@@ -89,6 +89,25 @@ router.get("/", requireAuth, async (req, res, next) => {
     }));
 
     return res.json({ users: result });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// Public: GET /api/users/:username - return public profile data for a username
+router.get("/:username", async (req, res, next) => {
+  try {
+    const { username } = req.params;
+    if (!username) return res.status(400).json({ error: { message: "username required" } });
+
+    const user = await prisma.user.findUnique({
+      where: { username },
+      select: { id: true, username: true, name: true, bio: true, avatarUrl: true },
+    });
+
+    if (!user) return res.status(404).json({ error: { message: "user not found" } });
+
+    return res.json({ user });
   } catch (err) {
     return next(err);
   }
