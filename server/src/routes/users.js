@@ -115,11 +115,15 @@ router.post("/avatar", requireAuth, async (req, res, next) => {
 // Update profile fields (e.g., bio)
 router.post("/profile", requireAuth, async (req, res, next) => {
   try {
-    const { bio } = req.body;
+    const { bio, name } = req.body;
+
+    const data = {};
+    if (typeof bio !== "undefined") data.bio = bio;
+    if (typeof name !== "undefined") data.name = name;
 
     const updated = await prisma.user.update({
       where: { id: req.user.id },
-      data: { bio },
+      data,
       select: { id: true, bio: true, avatarUrl: true, username: true, name: true },
     });
 
