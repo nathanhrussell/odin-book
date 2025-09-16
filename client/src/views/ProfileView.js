@@ -156,6 +156,7 @@ export async function ProfileView({ username } = {}) {
   const bioInput = bioControls.querySelector("#bio-input");
   const bioSave = bioControls.querySelector("#bio-save");
   const bioCancel = bioControls.querySelector("#bio-cancel");
+
   // Hook up bio save/cancel
   bioSave.addEventListener("click", async () => {
     const newBio = bioInput.value.trim();
@@ -273,17 +274,28 @@ export async function ProfileView({ username } = {}) {
 
   const loading = LoadingNode();
   postsSection.appendChild(loading);
+
+  // Track if we're viewing our own profile
+  let isOwnProfile = false;
+
   // Try to set avatar from current session (if viewing your own profile)
   try {
     const meResp = await auth.me();
     const meUser = meResp && meResp.user;
-    if (meUser && meUser.username === username && meUser.avatarUrl) {
-      avatarImg.src = avatarSrc(meUser.avatarUrl);
-      if (meUser.bio) bioNode.textContent = meUser.bio;
-      if (meUser.name) nameNode.textContent = meUser.name;
+    if (meUser && meUser.username === username) {
+      isOwnProfile = true;
+
+      // If avatar present, set it; otherwise leave default or fallback later
+      if (meUser.avatarUrl) avatarImg.src = avatarSrc(meUser.avatarUrl);
+
+      // Always set bio and name from me() response since it's the most current
+      bioNode.textContent = meUser.bio || "";
+      nameNode.textContent = meUser.name || "";
+
       // viewing own profile: show edit controls
       bioControls.style.display = "block";
       bioInput.value = meUser.bio || "";
+
       // show name edit button
       nameEditBtn.classList.remove("hidden");
     }
@@ -305,10 +317,6 @@ export async function ProfileView({ username } = {}) {
     // listeners were attached when the editor was created
   });
 
-  // Save name handler (function declaration so it's available to listeners)
-
-  // listeners are attached when the editor is created
-
   try {
     const resp = await apiPosts.list();
     const posts = Array.isArray(resp) ? resp : resp.posts || [];
@@ -324,8 +332,12 @@ export async function ProfileView({ username } = {}) {
       }
     }
 
-    // If the profile has no bio yet, try to read it from the post author info
-    if ((!bioNode.textContent || bioNode.textContent.trim() === "") && filtered.length) {
+    // Only set bio from post data if we're NOT viewing our own profile and bio is empty
+    if (
+      !isOwnProfile &&
+      (!bioNode.textContent || bioNode.textContent.trim() === "") &&
+      filtered.length
+    ) {
       const firstAuthor = filtered[0].author;
       if (firstAuthor && firstAuthor.bio) {
         bioNode.textContent = firstAuthor.bio;
