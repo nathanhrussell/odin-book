@@ -31,7 +31,7 @@ export function SignupView() {
       </form>
       <div class="text-center mt-8 text-lg">
         <span class="text-white">Already have an account?</span>
-        <button class="ml-2 text-blue-200 hover:underline font-semibold text-lg" id="to-login">Sign In</button>
+        <button class="ml-2 text-black-200 hover:underline font-semibold text-lg" id="to-login">Sign In</button>
       </div>
     </div>
   `;
@@ -80,7 +80,10 @@ export function SignupView() {
     e.preventDefault();
     if (!validate()) return;
     try {
-      await api.auth.register({ email: emailInput.value.trim(), password: passwordInput.value });
+      // Derive a simple username from the email local-part to satisfy server requirements
+      const emailVal = emailInput.value.trim();
+      const username = (emailVal.split("@")[0] || "").replace(/[^a-z0-9_-]/gi, "").toLowerCase();
+      await api.auth.register({ email: emailVal, password: passwordInput.value, username });
       // Redirect to login with a hash to indicate signup success
       window.location.hash = "#/login#signupSuccess";
       window.location.reload();
