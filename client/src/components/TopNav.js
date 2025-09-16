@@ -25,8 +25,10 @@ export function TopNav({ onLogoClick, onProfileClick }) {
     el.className = "sticky top-0 z-40";
     el.innerHTML = `
       <div style="background-color: #6B4CAD;" class="w-full">
-        <div class="mx-auto max-w-2xl px-4 py-4 flex items-center justify-center">
-          <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto h-20" />
+        <div class="px-4 py-6 flex items-center justify-center">
+          <button aria-label="Home" class="mx-auto">
+            <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto h-28" />
+          </button>
         </div>
       </div>
       <div class="mx-auto max-w-2xl px-4 h-12 flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-white dark:bg-gray-900">
@@ -144,11 +146,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
           </div>
         </div>
         <div class="mx-auto max-w-2xl px-4 h-12 flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-white dark:bg-gray-900">
-          <div class="flex items-center gap-3">
-            <button class="flex items-center gap-3" aria-label="Home">
-              <img src="/odinbooklogovector.svg" alt="Odin Book logo" class="w-8 h-8 rounded-md block"/>
-            </button>
-          </div>
+          <div class="flex items-center gap-3"></div>
           <nav class="flex items-center gap-3">
             <!-- theme + auth inserted below -->
             <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
@@ -162,11 +160,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
         "sticky top-0 z-40 border-b border-black/5 dark:border-white/10 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-gray-950/60";
       el.innerHTML = `
         <div class="mx-auto max-w-2xl px-4 h-16 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <button class="flex items-center gap-3" aria-label="Home">
-              <img src="/odinbooklogovector.svg" alt="Odin Book logo" class="w-10 h-10 rounded-md block"/>
-            </button>
-          </div>
+          <div class="flex items-center gap-3"></div>
           <nav class="flex items-center gap-3">
             <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
             <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
