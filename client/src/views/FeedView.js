@@ -18,18 +18,24 @@ export function PostCard(post, { onLike, onOpen }) {
   el.className = "card card-pad flex flex-col gap-3";
   el.setAttribute("tabindex", "0");
   el.setAttribute("role", "article");
-  el.setAttribute("aria-label", `Post by ${post.author.name}`);
+  el.setAttribute(
+    "aria-label",
+    `Post by ${post.author && (post.author.name || post.author.username)}`
+  );
   el.innerHTML = `
     <header class="flex items-center gap-3">
-      <img src="${avatarSrc(post.author.avatarUrl || post.author.avatar)}" alt="${
-    post.author.name || post.author.username
+      <img src="${avatarSrc(
+        (post.author && (post.author.avatarUrl || post.author.avatar)) || ""
+      )}" alt="${(post.author && (post.author.name || post.author.username)) || ""}
   }" class="w-10 h-10 rounded-full"/>
       <div>
-        <div class="font-semibold">${post.author.name || post.author.username}</div>
+  <div class="font-semibold">${
+    (post.author && (post.author.name || post.author.username)) || ""
+  }</div>
         <div class="text-xs text-gray-500">${new Date(post.createdAt).toLocaleString()}</div>
       </div>
     </header>
-    <p class="text-[15px] leading-6">${escapeHtml(post.content)}</p>
+  <p class="text-[15px] leading-6">${escapeHtml(post.body)}</p>
     <footer class="flex items-center gap-3 text-sm">
       <button class="btn btn-ghost" data-like aria-label="Like post">♡ <span>${
         post.likesCount ?? 0

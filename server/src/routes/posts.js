@@ -27,6 +27,7 @@ router.post("/", requireAuth, async (req, res, next) => {
 
     const post = await prisma.post.create({
       data: { body, imageUrl, authorId: req.user.id },
+      include: { author: { select: { id: true, username: true, name: true, avatarUrl: true } } },
     });
 
     return res.status(201).json({ post });
