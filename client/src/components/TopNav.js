@@ -1,6 +1,12 @@
 import { ThemeButton } from "../theme.js";
 import { navigate } from "../router.js";
-import { getCurrentUserSync, isSessionLoaded, fetchCurrentUser } from "../session.js";
+import {
+  getCurrentUserSync,
+  isSessionLoaded,
+  fetchCurrentUser,
+  clearCurrentUser,
+} from "../session.js";
+import api from "../api.js";
 
 export function TopNav({ onLogoClick, onProfileClick }) {
   const el = document.createElement("header");
@@ -58,6 +64,49 @@ export function TopNav({ onLogoClick, onProfileClick }) {
   // Theme button
   const right = el.querySelector("nav");
   right.appendChild(ThemeButton());
+
+  // Add login/logout button depending on session state
+  const addAuthButton = () => {
+    // remove existing auth button if present
+    const existing = el.querySelector("#auth-btn");
+    if (existing) existing.remove();
+
+    const cached = getCurrentUserSync();
+    const authBtn = document.createElement("button");
+    authBtn.id = "auth-btn";
+    if (cached && cached.username) {
+      // Red logout button
+      authBtn.className = "btn btn-ghost text-sm text-red-600 hover:bg-red-50";
+      authBtn.textContent = "Logout";
+      authBtn.addEventListener("click", async () => {
+        try {
+          await api.auth.logout();
+        } catch (err) {
+          // ignore errors
+        }
+        clearCurrentUser();
+        navigate("/login");
+      });
+    } else {
+      authBtn.className = "btn btn-ghost text-sm";
+      authBtn.textContent = "Sign In";
+      authBtn.addEventListener("click", () => navigate("/login"));
+    }
+
+    right.appendChild(authBtn);
+  };
+
+  // If session isn't loaded yet, fetch it once so the auth button shows the correct state
+  if (!isSessionLoaded()) {
+    fetchCurrentUser()
+      .then(() => addAuthButton())
+      .catch(() => addAuthButton());
+  } else {
+    addAuthButton();
+  }
+
+  // Re-render auth button when session changes
+  window.addEventListener("session:changed", () => addAuthButton());
 
   return el;
 }

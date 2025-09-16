@@ -1,5 +1,6 @@
 import api from "../api.js";
 import { navigate } from "../router.js";
+import { fetchCurrentUser } from "../session.js";
 
 export function LoginView() {
   const el = document.createElement("main");
@@ -75,6 +76,12 @@ export function LoginView() {
 
     try {
       await api.auth.login({ email, password });
+      // Refresh cached session so UI (TopNav) can update
+      try {
+        await fetchCurrentUser();
+      } catch (e) {
+        // ignore
+      }
       // On success navigate to feed
       navigate("/feed");
     } catch (err) {
