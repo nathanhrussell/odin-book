@@ -42,9 +42,9 @@ export function LoginView() {
             <button class="btn btn-on-brand px-12 py-4 text-xl font-semibold" type="submit">Sign In</button>
           </div>
         </form>
-        <div class="text-center mt-6">
-          <span class="text-gray-100">Don't have an account? </span>
-          <button id="to-signup" class="text-blue-200 hover:underline font-semibold">Sign Up</button>
+        <div class="text-center mt-10 flex flex-col items-center gap-2">
+          <span class="text-gray-100">Don't have an account?</span>
+          <button id="to-signup" class="btn btn-on-brand px-6 py-2 text-base font-semibold" style="min-width: 0; width: auto;">Sign Up</button>
         </div>
       </section>
     </div>
