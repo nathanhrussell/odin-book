@@ -1,7 +1,8 @@
-import { users, auth, posts as apiPosts } from "../api.js";
+import { users, auth, posts as apiPosts, follows } from "../api.js";
 import { LoadingNode, EmptyNode, ErrorNode } from "../components/Status.js";
 import { avatarSrc } from "../avatar.js";
 import { PostCard } from "./FeedView.js";
+import { showToast } from "../components/Toast.js";
 
 export async function ProfileView({ username } = {}) {
   const el = document.createElement("main");
@@ -317,6 +318,49 @@ export async function ProfileView({ username } = {}) {
     nameInputEl.focus();
     // listeners were attached when the editor was created
   });
+
+  // Follow button for other users' profiles
+  const followBtn = document.createElement("button");
+  followBtn.className = "btn btn-primary btn-sm";
+  followBtn.textContent = "Follow";
+  followBtn.style.display = "none";
+
+  async function updateFollowButton() {
+    try {
+      const meResp = await auth.me();
+      const meUser = meResp && meResp.user;
+      if (meUser && meUser.username !== username) {
+        const userResp = await users.list();
+        const targetUser = userResp.find((u) => u.username === username);
+        if (targetUser) {
+          followBtn.style.display = "block";
+          followBtn.textContent = targetUser.followStatus === "ACCEPTED" ? "Unfollow" : "Follow";
+          followBtn.onclick = async () => {
+            try {
+              if (targetUser.followStatus === "ACCEPTED") {
+                await follows.unfollow(targetUser.id);
+                targetUser.followStatus = null;
+                showToast("Unfollowed successfully.");
+              } else {
+                await follows.follow(targetUser.id);
+                targetUser.followStatus = "ACCEPTED";
+                showToast("Followed successfully.");
+              }
+              updateFollowButton();
+            } catch (err) {
+              console.error("Follow/unfollow action failed", err);
+              showToast("An error occurred. Please try again.");
+            }
+          };
+        }
+      }
+    } catch (err) {
+      console.error("Failed to update follow button", err);
+    }
+  }
+
+  header.appendChild(followBtn);
+  updateFollowButton();
 
   try {
     const resp = await apiPosts.list();

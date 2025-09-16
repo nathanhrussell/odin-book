@@ -5,24 +5,36 @@ const requireAuth = require("../middleware/auth.js");
 
 const router = express.Router();
 
-// Send a follow request (current user -> followeeId)
+// Protected: follow a user
 router.post("/:followeeId", requireAuth, async (req, res, next) => {
   try {
-    const followerId = req.user.id;
     const followeeId = Number(req.params.followeeId);
-    if (followerId === followeeId) {
-      return res.status(400).json({ error: { message: "Cannot follow yourself" } });
+    if (!followeeId) {
+      return res.status(400).json({ error: { message: "Invalid followee ID" } });
     }
 
-    try {
-      const follow = await prisma.follow.create({
-        data: { followerId, followeeId, status: "PENDING" },
-      });
-      return res.status(201).json({ follow });
-    } catch (err) {
-      // Unique constraint or other DB error
-      return res.status(409).json({ error: { message: "Follow request already exists" } });
+    const existingFollow = await prisma.follow.findUnique({
+      where: {
+        followerId_followeeId: {
+          followerId: req.user.id,
+          followeeId,
+        },
+      },
+    });
+
+    if (existingFollow) {
+      return res.status(200).json({ message: "Already following" });
     }
+
+    const follow = await prisma.follow.create({
+      data: {
+        followerId: req.user.id,
+        followeeId,
+        status: "ACCEPTED", // Directly set to ACCEPTED
+      },
+    });
+
+    return res.status(201).json({ follow });
   } catch (err) {
     return next(err);
   }
