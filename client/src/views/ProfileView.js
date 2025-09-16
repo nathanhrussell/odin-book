@@ -150,6 +150,16 @@ export async function ProfileView({ username } = {}) {
 
   const loading = LoadingNode();
   postsSection.appendChild(loading);
+  // Try to set avatar from current session (if viewing your own profile)
+  try {
+    const meResp = await api.auth.me();
+    const meUser = meResp && meResp.user;
+    if (meUser && meUser.username === username && meUser.avatarUrl) {
+      avatarImg.src = avatarSrc(meUser.avatarUrl);
+    }
+  } catch (e) {
+    // ignore: not logged in or me() failed
+  }
 
   try {
     const resp = await api.posts.list();
@@ -157,6 +167,14 @@ export async function ProfileView({ username } = {}) {
     const filtered = posts.filter((p) => p.author && p.author.username === username);
 
     postsSection.removeChild(loading);
+
+    // If we still have the default avatar but the user has posts, use the author's avatar from the first post
+    if (filtered.length && (!avatarImg.src || avatarImg.src.endsWith("default-avatar.svg"))) {
+      const firstAuthor = filtered[0].author;
+      if (firstAuthor && firstAuthor.avatarUrl) {
+        avatarImg.src = avatarSrc(firstAuthor.avatarUrl);
+      }
+    }
 
     if (!filtered.length) {
       postsSection.appendChild(EmptyNode("No posts yet"));
