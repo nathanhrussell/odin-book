@@ -1,6 +1,6 @@
 import { avatarSrc } from "../avatar.js";
 import * as session from "../session.js";
-import { posts as apiPosts } from "../api.js";
+import { posts as apiPosts, comments as apiComments } from "../api.js";
 import { showToast } from "../components/Toast.js";
 import { showConfirm } from "../components/ConfirmModal.js";
 
@@ -63,14 +63,99 @@ export function PostCard(post, { onLike, onOpen }) {
           : ""
       }
     </footer>
+    <!-- Inline comments container (hidden by default) -->
+    <section class="comments-container hidden mt-2">
+      <div class="comments-list flex flex-col gap-2 text-sm"></div>
+    </section>
+    <!-- Comment input is always visible; comments list toggles above -->
+    <form class="comments-form flex items-start gap-2 mt-2">
+      <img src="" alt="" class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 comment-avatar" />
+      <div class="flex-1">
+        <label for="comment-content" class="sr-only">Add a comment</label>
+        <textarea class="textarea h-12" name="comment" placeholder="Write a comment" maxlength="300" aria-label="Write a comment"></textarea>
+        <div class="flex items-center justify-end mt-1">
+          <button class="btn btn-primary btn-sm" type="submit">Reply</button>
+        </div>
+      </div>
+    </form>
   `;
 
   const likeBtn = el.querySelector("[data-like]");
   const openBtn = el.querySelector("[data-open]");
   const deleteBtn = el.querySelector("[data-delete]");
 
+  // Comments UI elements
+  const commentsContainer = el.querySelector(".comments-container");
+  const commentsList = el.querySelector(".comments-list");
+  const commentsForm = el.querySelector(".comments-form");
+  const commentsTextarea = commentsForm && commentsForm.querySelector('textarea[name="comment"]');
+
+  // State: whether we've loaded comments yet
+  let commentsLoaded = false;
+  let loadingComments = false;
+
+  function renderComment(comment) {
+    const node = document.createElement("div");
+    node.className = "comment card card-pad bg-gray-50 dark:bg-gray-900";
+    node.innerHTML = `
+      <div class="flex items-start gap-3">
+        <img src="${avatarSrc(
+          (comment.author && (comment.author.avatarUrl || comment.author.avatar)) || ""
+        )}" alt="${
+      (comment.author && (comment.author.name || comment.author.username)) || ""
+    } avatar" class="w-8 h-8 rounded-full" />
+        <div class="flex-1">
+          <div class="text-sm font-semibold">${escapeHtml(
+            (comment.author && (comment.author.name || comment.author.username)) || ""
+          )}</div>
+          <div class="text-xs text-gray-500">@${escapeHtml(
+            (comment.author && comment.author.username) || ""
+          )} · <span class="ml-1">${new Date(comment.createdAt).toLocaleString()}</span></div>
+          <div class="mt-1 text-sm">${escapeHtml(comment.body)}</div>
+        </div>
+      </div>
+    `;
+    return node;
+  }
+
+  async function loadComments() {
+    if (commentsLoaded || loadingComments) return;
+    loadingComments = true;
+    try {
+      // Prefer local import, fall back to global window.api if present
+      let fn = null;
+      if (apiComments && apiComments.list) fn = apiComments.list;
+      else if (window.api && window.api.comments && window.api.comments.list)
+        fn = window.api.comments.list;
+      const list = fn ? await fn(post.id) : [];
+      commentsList.innerHTML = "";
+      (Array.isArray(list) ? list : []).forEach((c) => {
+        commentsList.appendChild(renderComment(c));
+      });
+      commentsLoaded = true;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to load comments", err);
+    } finally {
+      loadingComments = false;
+    }
+  }
+
   if (likeBtn) likeBtn.addEventListener("click", () => onLike?.(post.id));
   if (openBtn) openBtn.addEventListener("click", () => onOpen?.(post.id));
+  // Toggle inline comments when open button clicked (expand inline)
+  if (openBtn && commentsContainer) {
+    openBtn.addEventListener("click", async () => {
+      // call external handler if provided
+      if (onOpen) onOpen(post.id);
+      if (commentsContainer.classList.contains("hidden")) {
+        commentsContainer.classList.remove("hidden");
+        await loadComments();
+      } else {
+        commentsContainer.classList.add("hidden");
+      }
+    });
+  }
   if (deleteBtn) {
     deleteBtn.addEventListener("click", async () => {
       const ok = await showConfirm("Delete this post? This cannot be undone.");
@@ -86,6 +171,53 @@ export function PostCard(post, { onLike, onOpen }) {
         console.error("Delete failed", err);
         showToast((err && err.message) || "Delete failed");
         if (deleteBtn) deleteBtn.disabled = false;
+      }
+    });
+  }
+
+  // Submit new comment
+  if (commentsForm && commentsTextarea) {
+    commentsForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const body = commentsTextarea.value && commentsTextarea.value.trim();
+      if (!body) return;
+      const submitBtn = commentsForm.querySelector('button[type="submit"]');
+      try {
+        if (submitBtn) submitBtn.disabled = true;
+        let createFn = null;
+        if (apiComments && apiComments.create) createFn = apiComments.create;
+        else if (window.api && window.api.comments && window.api.comments.create)
+          createFn = window.api.comments.create;
+        let created = null;
+        if (createFn) created = await createFn(post.id, body);
+        let toAppend;
+        if (created && created.comment) toAppend = created.comment;
+        else if (created) toAppend = created;
+        else
+          toAppend = {
+            id: `local-${Date.now()}`,
+            body,
+            createdAt: new Date().toISOString(),
+            author: session.getCurrentUserSync ? session.getCurrentUserSync() : null,
+          };
+        commentsList.appendChild(renderComment(toAppend));
+        // Clear textarea
+        commentsTextarea.value = "";
+        // update count badge in footer
+        const badge = el.querySelector("[data-open] span");
+        if (badge) {
+          const n = parseInt(badge.textContent || "0", 10) || 0;
+          badge.textContent = String(n + 1);
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to create comment", err);
+        showToast((err && err.message) || "Failed to post comment");
+      } finally {
+        if (commentsForm) {
+          const sb = commentsForm.querySelector('button[type="submit"]');
+          if (sb) sb.disabled = false;
+        }
       }
     });
   }

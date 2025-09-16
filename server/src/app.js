@@ -45,6 +45,8 @@ app.use("/api/posts", require("./routes/posts.js"));
 app.use("/api/users", require("./routes/users.js"));
 app.use("/api/follows", require("./routes/follows.js"));
 app.use("/api/feed", require("./routes/feed.js"));
+// Comments
+app.use("/api/comments", require("./routes/comments.js"));
 
 // If an unknown /api route is requested, return JSON 404 instead of HTML
 app.use("/api", (req, res) => {
