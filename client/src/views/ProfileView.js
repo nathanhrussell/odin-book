@@ -416,5 +416,10 @@ export async function ProfileView({ username } = {}) {
     postsSection.appendChild(ErrorNode((err && err.message) || "Failed to load posts"));
   }
 
+  // Hide avatar upload controls if viewing another user's profile
+  if (!isOwnProfile) {
+    avatarControls.style.display = "none";
+  }
+
   return el;
 }
