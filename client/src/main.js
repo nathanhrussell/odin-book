@@ -5,9 +5,19 @@ import { FeedView } from "./views/FeedView.js";
 import api from "./api.js";
 import { addRoute, start as startRouter, navigate } from "./router.js";
 import { LoginView } from "./views/LoginView.js";
+import { SignupView } from "../views/SignupView.js";
 import { UsersView } from "./views/UsersView.js";
 import { ProfileView } from "./views/ProfileView.js";
 import { LoadingNode, EmptyNode, ErrorNode } from "./components/Status.js";
+
+addRoute("/signup", {
+  requiresAuth: false,
+  render: async () => {
+    const container = document.createElement("div");
+    container.appendChild(SignupView());
+    return container;
+  },
+});
 
 initTheme();
 
