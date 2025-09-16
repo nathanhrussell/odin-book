@@ -48,6 +48,11 @@ app.use("/api/likes", require("./routes/likes.js"));
 app.use("/api/comments", require("./routes/comments.js"));
 app.use("/api/feed", require("./routes/feed.js"));
 
+// If an unknown /api route is requested, return JSON 404 instead of HTML
+app.use("/api", (req, res) => {
+  res.status(404).json({ error: { message: `Not found: ${req.method} ${req.originalUrl}` } });
+});
+
 // Error handler (should be last)
 app.use(errorHandler);
 

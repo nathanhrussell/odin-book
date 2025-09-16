@@ -1,5 +1,8 @@
 import { avatarSrc } from "../avatar.js";
 import * as session from "../session.js";
+import { posts as apiPosts } from "../api.js";
+import { showToast } from "../components/Toast.js";
+import { showConfirm } from "../components/ConfirmModal.js";
 
 function escapeHtml(str) {
   return String(str ?? "")
@@ -34,17 +37,43 @@ export function PostCard(post, { onLike, onOpen }) {
       <button class="btn btn-ghost" data-open aria-label="Open comments">💬 <span>${
         post.commentsCount ?? 0
       }</span></button>
+      ${
+        session.getCurrentUserSync && session.getCurrentUserSync()?.id === post.author.id
+          ? '<button class="btn btn-ghost text-red-400" data-delete aria-label="Delete post">🗑</button>'
+          : ""
+      }
     </footer>
   `;
 
   const likeBtn = el.querySelector("[data-like]");
   const openBtn = el.querySelector("[data-open]");
+  const deleteBtn = el.querySelector("[data-delete]");
 
   if (likeBtn) likeBtn.addEventListener("click", () => onLike?.(post.id));
   if (openBtn) openBtn.addEventListener("click", () => onOpen?.(post.id));
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", async () => {
+      const ok = await showConfirm("Delete this post? This cannot be undone.");
+      if (!ok) return;
+      try {
+        deleteBtn.disabled = true;
+        await apiPosts.delete(post.id);
+        // remove node from DOM
+        if (el && el.parentElement) el.parentElement.removeChild(el);
+        showToast("Post deleted");
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Delete failed", err);
+        showToast((err && err.message) || "Delete failed");
+        if (deleteBtn) deleteBtn.disabled = false;
+      }
+    });
+  }
 
   return el;
 }
+
+// (uses shared showToast from components/Toast.js)
 
 export function FeedView({ posts = [], onLike, onOpen, onCreate }) {
   const page = document.createElement("main");

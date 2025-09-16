@@ -85,6 +85,7 @@ export const auth = {
 export const posts = {
   list: () => fetchJson("/api/posts", { method: "GET" }).then((r) => r.posts || []),
   create: (body) => fetchJson("/api/posts", { method: "POST", body }),
+  delete: (id) => fetchJson(`/api/posts/${id}`, { method: "DELETE" }),
 };
 
 // Feed

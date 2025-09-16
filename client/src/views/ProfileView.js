@@ -1,4 +1,6 @@
 import { users, auth, posts as apiPosts } from "../api.js";
+import { showToast } from "../components/Toast.js";
+import { showConfirm } from "../components/ConfirmModal.js";
 import { LoadingNode, EmptyNode, ErrorNode } from "../components/Status.js";
 import { avatarSrc } from "../avatar.js";
 
@@ -349,13 +351,41 @@ export async function ProfileView({ username } = {}) {
       return el;
     }
 
+    // use shared showToast helper
+
     filtered.forEach((p) => {
       const node = document.createElement("article");
       node.className = "card card-pad";
       node.setAttribute("tabindex", "0");
       node.setAttribute("aria-label", `Post by ${username}`);
-      node.innerHTML = `<div class="text-sm text-gray-700">${p.body}</div>`;
+      node.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div class="text-sm text-gray-700">${p.body}</div>
+          ${isOwnProfile ? '<button class="btn btn-ghost text-red-400" data-delete>🗑</button>' : ""}
+        </div>
+      `;
       postsSection.appendChild(node);
+
+      if (isOwnProfile) {
+        const del = node.querySelector("[data-delete]");
+        if (del) {
+          del.addEventListener("click", async () => {
+            const ok = await showConfirm("Delete this post? This cannot be undone.");
+            if (!ok) return;
+            try {
+              del.disabled = true;
+              await apiPosts.delete(p.id);
+              if (node && node.parentElement) node.parentElement.removeChild(node);
+              showToast("Post deleted");
+            } catch (err) {
+              // eslint-disable-next-line no-console
+              console.error("Delete failed", err);
+              showToast((err && err.message) || "Delete failed");
+              if (del) del.disabled = false;
+            }
+          });
+        }
+      }
     });
   } catch (err) {
     postsSection.removeChild(loading);
