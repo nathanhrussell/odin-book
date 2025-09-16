@@ -91,6 +91,19 @@ export function FeedView({ posts = [], onLike, onOpen, onCreate }) {
 
   page.appendChild(list);
 
+  // If navigation requested focusing the composer (TopNav may set this), do it now
+  try {
+    if (sessionStorage.getItem("focusComposer") === "1") {
+      if (contentEl) {
+        contentEl.focus();
+        contentEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      sessionStorage.removeItem("focusComposer");
+    }
+  } catch (e) {
+    // ignore sessionStorage errors
+  }
+
   // Composer submit handler (optional onCreate)
   if (form && contentEl) {
     form.addEventListener("submit", async (e) => {

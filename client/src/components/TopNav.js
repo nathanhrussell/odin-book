@@ -65,6 +65,32 @@ export function TopNav({ onLogoClick, onProfileClick }) {
   const right = el.querySelector("nav");
   right.appendChild(ThemeButton());
 
+  // New Post button behavior: if we're already on the feed, focus the composer; otherwise navigate to feed and set a flag
+  const newPostBtn = el.querySelector("#new-post");
+  if (newPostBtn) {
+    newPostBtn.addEventListener("click", () => {
+      try {
+        const onFeed = (location.hash || "").startsWith("#/feed");
+        if (onFeed) {
+          const txt = document.querySelector("#content");
+          if (txt) {
+            txt.focus();
+            return undefined;
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+      try {
+        sessionStorage.setItem("focusComposer", "1");
+      } catch (e) {
+        // ignore
+      }
+      navigate("/feed");
+      return undefined;
+    });
+  }
+
   // Add login/logout button depending on session state
   const addAuthButton = () => {
     // remove existing auth button if present
