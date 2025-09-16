@@ -91,6 +91,41 @@ export function TopNav({ onLogoClick, onProfileClick }) {
     });
   }
 
+  // Update active state (primary/purple) for nav buttons based on current route
+  function updateActiveNav() {
+    try {
+      const hash = (location.hash || "").replace(/^#/, "");
+      const onFeed = hash.startsWith("/feed");
+      const onProfile = hash.startsWith("/profile");
+
+      if (newPostBtn) {
+        if (onFeed) {
+          newPostBtn.classList.add("btn-primary");
+          newPostBtn.classList.remove("btn-ghost");
+        } else {
+          newPostBtn.classList.remove("btn-primary");
+          newPostBtn.classList.add("btn-ghost");
+        }
+      }
+
+      if (profileBtn) {
+        if (onProfile) {
+          profileBtn.classList.add("btn-primary");
+          profileBtn.classList.remove("btn-ghost");
+        } else {
+          profileBtn.classList.remove("btn-primary");
+          profileBtn.classList.add("btn-ghost");
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Initialize and update on hash changes
+  updateActiveNav();
+  window.addEventListener("hashchange", updateActiveNav);
+
   // Add login/logout button depending on session state
   const addAuthButton = () => {
     // remove existing auth button if present
