@@ -31,7 +31,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
           </button>
         </div>
       </div>
-      <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-transparent dark:bg-gray-900">
+  <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between bg-transparent">
         <div class="flex items-center gap-3">
           <button class="flex items-center gap-3" aria-label="Home">
             <img src="/odinbooklogovector.svg" alt="Odin Book logo" class="w-12 h-12 rounded-md block"/>
@@ -145,7 +145,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
             <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto h-48" />
           </div>
         </div>
-        <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between border-b border-black/5 dark:border-white/10 bg-transparent dark:bg-gray-900">
+  <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between bg-transparent">
           <div class="flex items-center gap-3"></div>
           <nav class="flex items-center gap-3">
             <!-- theme + auth inserted below -->
@@ -159,7 +159,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
       el.className =
         "sticky top-0 z-40 border-b border-black/5 dark:border-white/10 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-gray-950/60";
       el.innerHTML = `
-        <div class="mx-auto max-w-4xl px-6 h-16 flex items-center justify-between">
+  <div class="mx-auto max-w-4xl px-6 h-16 flex items-center justify-between bg-transparent">
           <div class="flex items-center gap-3"></div>
           <nav class="flex items-center gap-3">
             <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
