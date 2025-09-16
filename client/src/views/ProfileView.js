@@ -1,5 +1,6 @@
 import api from "../api.js";
 import { LoadingNode, EmptyNode, ErrorNode } from "../components/Status.js";
+import { avatarSrc } from "../avatar.js";
 
 export async function ProfileView({ username } = {}) {
   const el = document.createElement("main");
@@ -8,7 +9,9 @@ export async function ProfileView({ username } = {}) {
   const header = document.createElement("header");
   header.className = "flex items-center gap-4";
   header.innerHTML = `
-    <img src="" alt="${username} avatar" id="profile-avatar" class="w-16 h-16 rounded-full bg-gray-200"/>
+    <img src="${avatarSrc(
+      ""
+    )}" alt="${username} avatar" id="profile-avatar" class="w-16 h-16 rounded-full bg-gray-200"/>
     <div>
       <div id="profile-name" class="font-semibold text-lg">${username}</div>
       <div id="profile-username" class="text-sm text-gray-500">@${username}</div>
@@ -41,7 +44,7 @@ export async function ProfileView({ username } = {}) {
       const res = await api.users.updateAvatar(avatarUrl);
       const updated = res.user;
       if (updated && updated.avatarUrl) {
-        avatarImg.src = updated.avatarUrl;
+        avatarImg.src = avatarSrc(updated.avatarUrl);
       }
     } catch (err) {
       // eslint-disable-next-line no-console

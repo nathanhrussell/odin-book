@@ -1,6 +1,7 @@
 import api from "../api.js";
 import { navigate } from "../router.js";
 import { LoadingNode, EmptyNode, ErrorNode } from "../components/Status.js";
+import { avatarSrc } from "../avatar.js";
 
 export async function UsersView() {
   const el = document.createElement("main");
@@ -25,7 +26,7 @@ export async function UsersView() {
     row.setAttribute("role", "listitem");
     row.innerHTML = `
         <div class="flex items-center gap-3">
-          <img src="${u.avatarUrl || ""}" alt="${
+          <img src="${avatarSrc(u.avatarUrl)}" alt="${
       u.name || u.username
     }" class="w-10 h-10 rounded-full bg-gray-200"/>
           <div>

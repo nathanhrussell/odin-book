@@ -1,3 +1,5 @@
+import { avatarSrc } from "../avatar.js";
+
 function escapeHtml(str) {
   return String(str ?? "")
     .replaceAll("&", "&amp;")
@@ -15,9 +17,11 @@ export function PostCard(post, { onLike, onOpen }) {
   el.setAttribute("aria-label", `Post by ${post.author.name}`);
   el.innerHTML = `
     <header class="flex items-center gap-3">
-      <img src="${post.author.avatar}" alt="${post.author.name}" class="w-10 h-10 rounded-full"/>
+      <img src="${avatarSrc(post.author.avatarUrl || post.author.avatar)}" alt="${
+    post.author.name || post.author.username
+  }" class="w-10 h-10 rounded-full"/>
       <div>
-        <div class="font-semibold">${post.author.name}</div>
+        <div class="font-semibold">${post.author.name || post.author.username}</div>
         <div class="text-xs text-gray-500">${new Date(post.createdAt).toLocaleString()}</div>
       </div>
     </header>
@@ -49,7 +53,9 @@ export function FeedView({ posts = [], onLike, onOpen, onCreate }) {
   const composer = document.createElement("section");
   composer.className = "card card-pad flex gap-3";
   composer.innerHTML = `
-    <img src="" alt="" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800" id="me-avatar"/>
+  <img src="${avatarSrc(
+    ""
+  )}" alt="" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800" id="me-avatar"/>
     <form id="composer" class="flex-1 flex flex-col gap-3">
       <label for="content" class="sr-only">Post content</label>
       <textarea class="textarea" id="content" placeholder="What’s happening?" maxlength="500" aria-label="Post content"></textarea>
