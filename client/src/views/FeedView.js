@@ -24,15 +24,29 @@ export function PostCard(post, { onLike, onOpen }) {
   );
   el.innerHTML = `
     <header class="flex items-center gap-3">
-      <img src="${avatarSrc(
-        (post.author && (post.author.avatarUrl || post.author.avatar)) || ""
-      )}" alt="${(post.author && (post.author.name || post.author.username)) || ""}
-  }" class="w-10 h-10 rounded-full"/>
-      <div>
-  <div class="font-semibold">${
+      <a href="#/profile/${encodeURIComponent(post.author && post.author.username)}" class="block">
+        <img src="${avatarSrc(
+          (post.author && (post.author.avatarUrl || post.author.avatar)) || ""
+        )}" alt="${
     (post.author && (post.author.name || post.author.username)) || ""
-  }</div>
-        <div class="text-xs text-gray-500">${new Date(post.createdAt).toLocaleString()}</div>
+  } profile avatar" class="w-10 h-10 rounded-full"/>
+      </a>
+      <div>
+        <div class="font-semibold">
+          <a href="#/profile/${encodeURIComponent(
+            post.author && post.author.username
+          )}" class="hover:underline">${
+    (post.author && (post.author.name || post.author.username)) || ""
+  }</a>
+        </div>
+        <div class="text-xs text-gray-500">
+          <a href="#/profile/${encodeURIComponent(
+            post.author && post.author.username
+          )}" class="text-xs text-gray-500 hover:underline">@${
+    post.author && post.author.username
+  }</a>
+          <span class="ml-2">${new Date(post.createdAt).toLocaleString()}</span>
+        </div>
       </div>
     </header>
   <p class="text-[15px] leading-6">${escapeHtml(post.body)}</p>
@@ -145,6 +159,13 @@ export function FeedView({ posts = [], onLike, onOpen, onCreate }) {
     if (meUsername) meUsername.textContent = u.username ? `@${u.username}` : "";
     const bioEl = composer.querySelector("#me-bio");
     if (bioEl) bioEl.textContent = u.bio || "";
+    // Update avatar/profile link target
+    const avatarLink = composer.querySelector("#me-avatar-link");
+    if (avatarLink) {
+      if (u && u.username)
+        avatarLink.setAttribute("href", `#/profile/${encodeURIComponent(u.username)}`);
+      else avatarLink.removeAttribute("href");
+    }
   }
 
   // Initial population (if session already loaded)

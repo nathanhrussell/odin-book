@@ -11,15 +11,21 @@ export async function ProfileView({ username } = {}) {
   const header = document.createElement("header");
   header.className = "flex items-center gap-4";
   header.innerHTML = `
-    <img src="${avatarSrc(
-      ""
-    )}" alt="${username} avatar" id="profile-avatar" class="w-16 h-16 rounded-full bg-gray-200"/>
+    <a href="#/profile/${encodeURIComponent(username)}" class="block">
+      <img src="${avatarSrc(
+        ""
+      )}" alt="${username} avatar" id="profile-avatar" class="w-16 h-16 rounded-full bg-gray-200"/>
+    </a>
     <div>
       <div class="flex items-center gap-2">
-        <div id="profile-name" class="font-semibold text-lg">${username}</div>
+        <div id="profile-name" class="font-semibold text-lg"><a href="#/profile/${encodeURIComponent(
+          username
+        )}" class="hover:underline">${username}</a></div>
         <button id="name-edit" class="btn btn-ghost btn-sm hidden">Edit</button>
       </div>
-      <div id="profile-username" class="text-sm text-gray-500">@${username}</div>
+      <div id="profile-username" class="text-sm text-gray-500"><a href="#/profile/${encodeURIComponent(
+        username
+      )}" class="text-sm text-gray-500 hover:underline">@${username}</a></div>
       <div id="profile-bio" class="text-sm text-gray-700 mt-1"></div>
     </div>
   `;

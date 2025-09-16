@@ -26,12 +26,18 @@ export async function UsersView() {
     row.setAttribute("role", "listitem");
     row.innerHTML = `
         <div class="flex items-center gap-3">
-          <img src="${avatarSrc(u.avatarUrl)}" alt="${
+          <a href="#/profile/${encodeURIComponent(u.username)}" class="block">
+            <img src="${avatarSrc(u.avatarUrl)}" alt="${
       u.name || u.username
-    }" class="w-10 h-10 rounded-full bg-gray-200"/>
+    } profile avatar" class="w-10 h-10 rounded-full bg-gray-200"/>
+          </a>
           <div>
-            <div class="font-semibold">${u.name || u.username}</div>
-            <div class="text-xs text-gray-500">@${u.username}</div>
+            <div class="font-semibold"><a href="#/profile/${encodeURIComponent(
+              u.username
+            )}" class="hover:underline">${u.name || u.username}</a></div>
+            <div class="text-xs text-gray-500"><a href="#/profile/${encodeURIComponent(
+              u.username
+            )}" class="text-xs text-gray-500 hover:underline">@${u.username}</a></div>
           </div>
         </div>
       `;
