@@ -126,6 +126,10 @@ button:focus-visible {
   .card {
     @apply rounded-2xl bg-white dark:bg-gray-900 shadow-soft border border-black/5 dark:border-white/5;
   }
+  /* Ensure top nav inner container isn't shown as a white card in light mode */
+  .topnav-inner-bg {
+    background-color: transparent;
+  }
   .card-on-brand {
     /* slightly translucent panel on top of the brand background */
     background-color: color-mix(in srgb, var(--brand-bg) 80%, white 20%);
