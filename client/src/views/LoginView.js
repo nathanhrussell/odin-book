@@ -9,17 +9,16 @@ export function LoginView() {
 
   // Set the body background color to #400c94 for full viewport coverage
   document.body.style.backgroundColor = "#6B4CAD";
-  // Check for signup success (from navigation)
+  // Check for signup success flag set by SignupView via sessionStorage
   let signupSuccess = false;
   try {
-    const url = new URL(window.location.href);
-    if (url.hash.includes("signupSuccess")) {
+    if (sessionStorage.getItem("signupSuccess") === "1") {
       signupSuccess = true;
-      // Remove the flag from the hash for cleanliness
-      url.hash = url.hash.replace("signupSuccess", "");
-      window.history.replaceState({}, document.title, url.toString());
+      sessionStorage.removeItem("signupSuccess");
     }
-  } catch {}
+  } catch (e) {
+    // ignore
+  }
 
   el.innerHTML = `
     <div class="w-full max-w-xl px-4 py-24">

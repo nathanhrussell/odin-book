@@ -79,16 +79,37 @@ export function SignupView() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!validate()) return;
+
     try {
       // Derive a simple username from the email local-part to satisfy server requirements
       const emailVal = emailInput.value.trim();
       const username = (emailVal.split("@")[0] || "").replace(/[^a-z0-9_-]/gi, "").toLowerCase();
+
       await api.auth.register({ email: emailVal, password: passwordInput.value, username });
-      // Redirect to login with a hash to indicate signup success
-      window.location.hash = "#/login#signupSuccess";
-      window.location.reload();
+
+      // Mark signup success in sessionStorage and navigate to login
+      try {
+        sessionStorage.setItem("signupSuccess", "1");
+      } catch (err) {
+        // ignore sessionStorage errors
+      }
+      navigate("/login");
     } catch (err) {
-      serverError.textContent = (err && err.message) || "Signup failed.";
+      // Handle specific error messages
+      const errorMessage = (err && err.message) || "Signup failed.";
+
+      // Show email-specific errors in the email field
+      if (errorMessage.toLowerCase().includes("email")) {
+        emailError.textContent = errorMessage;
+      }
+      // Show username-specific errors as server errors since username is auto-generated
+      else if (errorMessage.toLowerCase().includes("username")) {
+        serverError.textContent = "Username conflict. Please try a different email address.";
+      }
+      // Show generic errors in server error area
+      else {
+        serverError.textContent = errorMessage;
+      }
     }
   });
 

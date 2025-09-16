@@ -23,6 +23,21 @@ router.post("/register", async (req, res, next) => {
       return res.status(400).json({ error: { message: "Missing required fields" } });
     }
 
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { username }],
+      },
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(409).json({ error: { message: "Email already registered" } });
+      }
+      if (existingUser.username === username) {
+        return res.status(409).json({ error: { message: "Username already taken" } });
+      }
+    }
+
     const hashed = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: { email, username, password: hashed, name },
