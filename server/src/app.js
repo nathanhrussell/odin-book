@@ -45,6 +45,8 @@ app.use("/api/posts", require("./routes/posts.js"));
 app.use("/api/users", require("./routes/users.js"));
 app.use("/api/follows", require("./routes/follows.js"));
 app.use("/api/feed", require("./routes/feed.js"));
+// Likes (toggle)
+app.use("/api/likes", require("./routes/likes.js"));
 // Comments
 app.use("/api/comments", require("./routes/comments.js"));
 

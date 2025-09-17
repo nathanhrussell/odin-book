@@ -81,7 +81,7 @@ export function PostCard(post, { onLike, onOpen }) {
   `;
 
   const likeBtn = el.querySelector("[data-like]");
-  let liked = false;
+  let liked = post.likedByMe || false;
   let likeCount = post.likesCount ?? 0;
   // Optionally, you could pass liked state from the API if available
 

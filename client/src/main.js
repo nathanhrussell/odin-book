@@ -50,10 +50,12 @@ addRoute("/feed", {
         posts,
         onLike: async (id) => {
           try {
-            await api.likes.toggle(id);
+            // Return the API result so callers (PostCard) can reconcile UI with server state
+            return await api.likes.toggle(id);
           } catch (e) {
             // eslint-disable-next-line no-console
             console.error("Like failed", e);
+            throw e;
           }
         },
         onOpen: (id) => console.log("open", id),

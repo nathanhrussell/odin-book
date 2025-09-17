@@ -37,7 +37,7 @@ router.get("/", requireAuth, async (req, res, next) => {
     });
 
     // Map Prisma _count into top-level likesCount/commentsCount to keep client shape stable
-    const mapped = posts.map((p) => {
+    let mapped = posts.map((p) => {
       /* eslint-disable no-underscore-dangle */
       const likesCount = (p._count && p._count.likes) || 0;
       const commentsCount = (p._count && p._count.comments) || 0;
@@ -46,12 +46,24 @@ router.get("/", requireAuth, async (req, res, next) => {
       const copy = { ...p };
       copy.likesCount = likesCount;
       copy.commentsCount = commentsCount;
+      copy.likedByMe = false; // default
       // remove _count to keep payload small/consistent
       /* eslint-disable no-underscore-dangle */
       delete copy._count;
       /* eslint-enable no-underscore-dangle */
       return copy;
     });
+
+    // Determine which of these posts the current user has liked
+    if (req.user && req.user.id && mapped.length) {
+      const postIds = posts.map((p) => p.id);
+      const userLikes = await prisma.like.findMany({
+        where: { postId: { in: postIds }, userId: req.user.id },
+        select: { postId: true },
+      });
+      const likedPostIds = new Set(userLikes.map((l) => l.postId));
+      mapped = mapped.map((p) => ({ ...p, likedByMe: likedPostIds.has(p.id) }));
+    }
 
     // nextCursor is the createdAt of the last item, if any
     const nextCursor = mapped.length ? mapped[mapped.length - 1].createdAt.toISOString() : null;

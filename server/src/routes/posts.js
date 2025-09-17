@@ -2,11 +2,12 @@ const express = require("express");
 
 const prisma = require("../prisma.js");
 const requireAuth = require("../middleware/auth.js");
+const optionalAuth = require("../middleware/optionalAuth.js");
 
 const router = express.Router();
 
 // Public: list recent posts
-router.get("/", async (req, res, next) => {
+router.get("/", optionalAuth, async (req, res, next) => {
   try {
     const posts = await prisma.post.findMany({
       orderBy: { createdAt: "desc" },
@@ -17,7 +18,7 @@ router.get("/", async (req, res, next) => {
       },
     });
 
-    const mapped = posts.map((p) => {
+    let mapped = posts.map((p) => {
       /* eslint-disable no-underscore-dangle */
       const likesCount = (p._count && p._count.likes) || 0;
       const commentsCount = (p._count && p._count.comments) || 0;
@@ -25,11 +26,28 @@ router.get("/", async (req, res, next) => {
       const copy = { ...p };
       copy.likesCount = likesCount;
       copy.commentsCount = commentsCount;
+      copy.likedByMe = false; // Default to false
       /* eslint-disable no-underscore-dangle */
       delete copy._count;
       /* eslint-enable no-underscore-dangle */
       return copy;
     });
+
+    // If user is logged in, check which posts they've liked
+    if (req.user && req.user.id) {
+      const postIds = posts.map((p) => p.id);
+      const userLikes = await prisma.like.findMany({
+        where: {
+          postId: { in: postIds },
+          userId: req.user.id,
+        },
+      });
+      const likedPostIds = new Set(userLikes.map((like) => like.postId));
+      mapped = mapped.map((p) => ({
+        ...p,
+        likedByMe: likedPostIds.has(p.id),
+      }));
+    }
 
     return res.json({ posts: mapped });
   } catch (err) {
