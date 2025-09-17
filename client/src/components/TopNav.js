@@ -161,12 +161,10 @@ export function TopNav({ onLogoClick, onProfileClick }) {
   function renderHeader() {
     const cached = getCurrentUserSync();
     if (cached && cached.username) {
-      // Signed in banner + compact nav
+      // Signed in: always show Find People between Profile and Logout
       try {
         document.body.style.backgroundColor = "";
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
       el.className = "sticky top-0 z-40 left-0 right-0";
       el.innerHTML = `
         <div style="background-color: #6B4CAD; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); width: 100vw; margin-top: calc(-2.5rem);">
@@ -174,12 +172,13 @@ export function TopNav({ onLogoClick, onProfileClick }) {
             <img src="/odinbooklogovector.svg" alt="Odin Book" class="mx-auto h-48" />
           </div>
         </div>
-  <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between bg-transparent">
+        <div class="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between bg-transparent">
           <div class="flex items-center gap-3"></div>
           <nav class="flex items-center gap-3">
             <!-- theme + auth inserted below -->
             <button id="posts" class="btn btn-primary text-sm" aria-label="View posts">Posts</button>
             <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
+            <button id="find-people" class="btn btn-ghost text-sm" aria-label="Find people">Find People</button>
           </nav>
         </div>
       `;
