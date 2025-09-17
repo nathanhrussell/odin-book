@@ -36,10 +36,27 @@ router.get("/", requireAuth, async (req, res, next) => {
       },
     });
 
-    // nextCursor is the createdAt of the last item, if any
-    const nextCursor = posts.length ? posts[posts.length - 1].createdAt.toISOString() : null;
+    // Map Prisma _count into top-level likesCount/commentsCount to keep client shape stable
+    const mapped = posts.map((p) => {
+      /* eslint-disable no-underscore-dangle */
+      const likesCount = (p._count && p._count.likes) || 0;
+      const commentsCount = (p._count && p._count.comments) || 0;
+      /* eslint-enable no-underscore-dangle */
+      // shallow copy to avoid mutating prisma result
+      const copy = { ...p };
+      copy.likesCount = likesCount;
+      copy.commentsCount = commentsCount;
+      // remove _count to keep payload small/consistent
+      /* eslint-disable no-underscore-dangle */
+      delete copy._count;
+      /* eslint-enable no-underscore-dangle */
+      return copy;
+    });
 
-    return res.json({ posts, nextCursor });
+    // nextCursor is the createdAt of the last item, if any
+    const nextCursor = mapped.length ? mapped[mapped.length - 1].createdAt.toISOString() : null;
+
+    return res.json({ posts: mapped, nextCursor });
   } catch (err) {
     return next(err);
   }

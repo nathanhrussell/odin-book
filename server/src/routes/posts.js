@@ -11,9 +11,27 @@ router.get("/", async (req, res, next) => {
     const posts = await prisma.post.findMany({
       orderBy: { createdAt: "desc" },
       take: 20,
-      include: { author: { select: { id: true, username: true, avatarUrl: true } } },
+      include: {
+        author: { select: { id: true, username: true, avatarUrl: true } },
+        _count: { select: { likes: true, comments: true } },
+      },
     });
-    return res.json({ posts });
+
+    const mapped = posts.map((p) => {
+      /* eslint-disable no-underscore-dangle */
+      const likesCount = (p._count && p._count.likes) || 0;
+      const commentsCount = (p._count && p._count.comments) || 0;
+      /* eslint-enable no-underscore-dangle */
+      const copy = { ...p };
+      copy.likesCount = likesCount;
+      copy.commentsCount = commentsCount;
+      /* eslint-disable no-underscore-dangle */
+      delete copy._count;
+      /* eslint-enable no-underscore-dangle */
+      return copy;
+    });
+
+    return res.json({ posts: mapped });
   } catch (err) {
     return next(err);
   }
