@@ -161,20 +161,48 @@ export function PostCard(post, { onLike, onOpen }) {
     return node;
   }
 
+  // Show only two comments by default, with option to load more
+  let allComments = [];
+  let showingAllComments = false;
+  let loadMoreBtn = null;
+
+  function renderComments() {
+    commentsList.innerHTML = "";
+    let toShow = allComments;
+    if (!showingAllComments && allComments.length > 2) {
+      toShow = allComments.slice(0, 2);
+    }
+    toShow.forEach((c) => {
+      commentsList.appendChild(renderComment(c));
+    });
+    // Add or remove load more button
+    if (!showingAllComments && allComments.length > 2) {
+      if (!loadMoreBtn) {
+        loadMoreBtn = document.createElement("button");
+        loadMoreBtn.className = "btn btn-ghost text-xs mt-2";
+        loadMoreBtn.textContent = `Load more comments (${allComments.length - 2} more)`;
+        loadMoreBtn.addEventListener("click", () => {
+          showingAllComments = true;
+          renderComments();
+        });
+      }
+      commentsList.appendChild(loadMoreBtn);
+    } else if (loadMoreBtn && loadMoreBtn.parentElement) {
+      loadMoreBtn.parentElement.removeChild(loadMoreBtn);
+    }
+  }
+
   async function loadComments() {
     if (commentsLoaded || loadingComments) return;
     loadingComments = true;
     try {
-      // Prefer local import, fall back to global window.api if present
       let fn = null;
       if (apiComments && apiComments.list) fn = apiComments.list;
       else if (window.api && window.api.comments && window.api.comments.list)
         fn = window.api.comments.list;
       const list = fn ? await fn(post.id) : [];
-      commentsList.innerHTML = "";
-      (Array.isArray(list) ? list : []).forEach((c) => {
-        commentsList.appendChild(renderComment(c));
-      });
+      allComments = Array.isArray(list) ? list : [];
+      renderComments();
       commentsLoaded = true;
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -189,11 +217,13 @@ export function PostCard(post, { onLike, onOpen }) {
   // Toggle inline comments when open button clicked (expand inline)
   if (openBtn && commentsContainer) {
     openBtn.addEventListener("click", async () => {
-      // call external handler if provided
       if (onOpen) onOpen(post.id);
       if (commentsContainer.classList.contains("hidden")) {
         commentsContainer.classList.remove("hidden");
         await loadComments();
+        // Reset to only show two comments when opening
+        showingAllComments = false;
+        renderComments();
       } else {
         commentsContainer.classList.add("hidden");
       }
@@ -243,7 +273,9 @@ export function PostCard(post, { onLike, onOpen }) {
             createdAt: new Date().toISOString(),
             author: session.getCurrentUserSync ? session.getCurrentUserSync() : null,
           };
-        commentsList.appendChild(renderComment(toAppend));
+        // Add new comment to allComments and re-render
+        allComments.push(toAppend);
+        renderComments();
         // Clear textarea
         commentsTextarea.value = "";
         // update count badge in footer
