@@ -27,7 +27,10 @@ function accessCookieOptions() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    // Allow overriding SameSite via env var for deployments where client and API
+    // are on different origins (e.g. Render static site + web service).
+    // Set COOKIE_SAME_SITE=none to allow cross-site cookies (requires secure=true).
+    sameSite: process.env.COOKIE_SAME_SITE || "lax",
     maxAge: 15 * 60 * 1000, // 15 minutes in ms
     path: "/",
   };
@@ -37,7 +40,7 @@ function refreshCookieOptions() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.COOKIE_SAME_SITE || "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
     path: "/",
   };
