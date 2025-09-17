@@ -71,6 +71,12 @@ h1 {
   padding: 2em;
 }
 
+@layer components {
+  .card-pad {
+    @apply p-4 sm:p-6;
+  }
+}
+
 .read-the-docs {
   color: #888;
 }
@@ -136,9 +142,46 @@ button:focus-visible {
     border: 1px solid rgba(255, 255, 255, 0.04);
     color: #fff;
   }
-  .card-pad {
-    @apply p-4 sm:p-6;
+  /* Ensure button text remains visible on brand panels (login view) */
+  .card-on-brand .btn-primary,
+  .card-on-brand button.btn-primary {
+    /* Keep primary buttons readable on the purple brand background */
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.12);
   }
+  .card-on-brand .btn-ghost,
+  .card-on-brand button.btn-ghost {
+    background-color: transparent;
+    color: #fff;
+    border-color: transparent;
+  }
+}
+
+/* Force logout text red in dark mode too when a logout class uses text-red-600 */
+@media (prefers-color-scheme: dark) {
+  /* If a logout button is styled with text-red-600 (e.g. via class on TopNav), ensure it's visible */
+  .btn-ghost.text-red-600,
+  button.btn-ghost.text-red-600 {
+    color: #ef4444; /* matches Tailwind text-red-500/600 family */
+  }
+  /* ensure hover state keeps clear contrast */
+  .btn-ghost.text-red-600:hover,
+  button.btn-ghost.text-red-600:hover {
+    background-color: rgba(255, 0, 0, 0.04);
+    color: #ff6b6b;
+  }
+}
+
+/* Also make sure sign-in button on brand full-page login (if the button is within a body-immersive brand area)
+   remains visible: sometimes a global button background combined with card-on-brand can yield low contrast.
+   Apply a slightly stronger white text color and subtle semi-opaque background for primary buttons on top of brand. */
+
+.brand-immersive .btn-primary,
+.brand-immersive button.btn-primary {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.12);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 /* Responsive adjustments: preserve visual design but improve usability on small
