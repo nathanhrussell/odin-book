@@ -140,3 +140,119 @@ button:focus-visible {
     @apply p-4 sm:p-6;
   }
 }
+
+/* Responsive adjustments: preserve visual design but improve usability on small
+   and medium screens. These overrides are intentionally light-weight so the
+   Tailwind utility classes still drive most of the UI while we tweak spacing,
+   sizing and wrapping behavior for phones/tablets. */
+
+@media (max-width: 640px) {
+  :root {
+    /* Slightly reduce base size on very small screens so layout breathes */
+    font-size: 16px;
+  }
+
+  /* Reduce large page padding so content fits on small viewports */
+  #app {
+    padding: 1rem;
+  }
+
+  /* Make the app container and common centered containers full-width minus padding */
+  .mx-auto.max-w-4xl,
+  .mx-auto.max-w-2xl,
+  #app {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Smaller logo/header */
+  .logo {
+    height: 4em;
+    padding: 0.75em;
+  }
+  .logo img,
+  .mx-auto img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Reduce heavy card padding on small screens */
+  .card {
+    padding: 1rem;
+  }
+  .card.card-pad {
+    padding: 0.75rem;
+  }
+
+  /* Tighter buttons on mobile */
+  button,
+  .btn {
+    font-size: 0.95rem;
+    padding: 0.45em 0.8em;
+  }
+
+  /* Headings scale down */
+  h1 {
+    font-size: 2em;
+  }
+
+  /* Allow top nav items to wrap/scroll horizontally when space is constrained */
+  header nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.5rem;
+  }
+  header nav::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  /* Feed/profile main column padding adjustments */
+  .mx-auto.max-w-2xl.px-4,
+  .mx-auto.max-w-2xl.px-6 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  /* Make avatar & comment controls a bit smaller */
+  .comments-form .comment-avatar,
+  .w-10.h-10 {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  /* Ensure textarea inputs remain usable on small screens */
+  .textarea {
+    min-height: 72px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Tablet adjustments: preserve desktop feel but reduce some padding */
+  :root {
+    font-size: 17px;
+  }
+  #app {
+    padding: 1.5rem;
+  }
+  .logo {
+    height: 5.5em;
+    padding: 1rem;
+  }
+  .card {
+    padding: 1.5rem;
+  }
+  /* Slightly reduce the max width of large centered containers so two-column
+     feels balanced on tablets */
+  .mx-auto.max-w-4xl {
+    max-width: 1100px;
+  }
+}
+
+/* Small utility: keep large hero/header logo from overflowing on very narrow viewports */
+.mx-auto img.h-48,
+.logo.h-48 {
+  max-height: 12rem;
+  height: auto;
+}
