@@ -38,8 +38,10 @@ export function TopNav({ onLogoClick, onProfileClick }) {
           </button>
         </div>
         <nav class="flex items-center gap-3">
-          <button id="posts" class="btn btn-primary text-sm" aria-label="View posts">Posts</button>
+          <button id="posts" class="btn btn-ghost text-sm" aria-label="View posts">Posts</button>
+          <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
           <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
+          <button id="find-people" class="btn btn-ghost text-sm" aria-label="Find people">Find People</button>
         </nav>
       </div>
     `;
@@ -56,8 +58,10 @@ export function TopNav({ onLogoClick, onProfileClick }) {
           </button>
         </div>
         <nav class="flex items-center gap-3">
-          <button id="posts" class="btn btn-primary text-sm" aria-label="View posts">Posts</button>
+          <button id="posts" class="btn btn-ghost text-sm" aria-label="View posts">Posts</button>
+          <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
           <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
+          <button id="find-people" class="btn btn-ghost text-sm" aria-label="Find people">Find People</button>
         </nav>
       </div>
     `;
@@ -72,6 +76,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
       const onProfile = hash.startsWith("/profile");
       const newPostBtn = el.querySelector("#new-post");
       const postsBtn = el.querySelector("#posts");
+      const findPeopleBtn = el.querySelector("#find-people");
       const profileBtn = el.querySelector("#profile");
 
       if (newPostBtn) {
@@ -91,6 +96,18 @@ export function TopNav({ onLogoClick, onProfileClick }) {
         } else {
           postsBtn.classList.remove("btn-primary");
           postsBtn.classList.add("btn-ghost");
+        }
+      }
+
+      if (findPeopleBtn) {
+        // treat /users as active when hash starts with /users
+        const onUsers = hash.startsWith("/users");
+        if (onUsers) {
+          findPeopleBtn.classList.add("btn-primary");
+          findPeopleBtn.classList.remove("btn-ghost");
+        } else {
+          findPeopleBtn.classList.remove("btn-primary");
+          findPeopleBtn.classList.add("btn-ghost");
         }
       }
 
@@ -192,6 +209,11 @@ export function TopNav({ onLogoClick, onProfileClick }) {
     const postsBtn = el.querySelector("#posts");
     if (postsBtn) {
       postsBtn.addEventListener("click", () => navigate("/posts"));
+    }
+
+    const findPeopleBtn = el.querySelector("#find-people");
+    if (findPeopleBtn) {
+      findPeopleBtn.addEventListener("click", () => navigate("/users"));
     }
 
     const profileBtn = el.querySelector("#profile");

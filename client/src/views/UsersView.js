@@ -1,4 +1,5 @@
 import api from "../api.js";
+import * as session from "../session.js";
 import { navigate } from "../router.js";
 import { LoadingNode, EmptyNode, ErrorNode } from "../components/Status.js";
 import { avatarSrc } from "../avatar.js";
@@ -9,7 +10,7 @@ export async function UsersView() {
 
   const title = document.createElement("h2");
   title.className = "text-lg font-semibold";
-  title.textContent = "Users";
+  title.textContent = "Find People";
   el.appendChild(title);
 
   const list = document.createElement("section");
@@ -88,11 +89,19 @@ export async function UsersView() {
   try {
     const users = await api.users.list();
     list.removeChild(loading);
-    if (!users.length) {
-      list.appendChild(EmptyNode("No users"));
+    // Exclude current user and users already followed (followStatus === 'ACCEPTED')
+    const me = session.getCurrentUserSync ? session.getCurrentUserSync() : null;
+    const filtered = (users || []).filter((u) => {
+      if (!u) return false;
+      if (me && me.id === u.id) return false;
+      if (u.followStatus === "ACCEPTED") return false;
+      return true;
+    });
+    if (!filtered.length) {
+      list.appendChild(EmptyNode("No people to follow"));
       return el;
     }
-    users.forEach((u) => list.appendChild(createRow(u)));
+    filtered.forEach((u) => list.appendChild(createRow(u)));
   } catch (err) {
     list.removeChild(loading);
     // eslint-disable-next-line no-console
