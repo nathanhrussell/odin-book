@@ -63,8 +63,8 @@ export function PostCard(post, { onLike, onOpen }) {
           : ""
       }
     </footer>
-    <!-- Inline comments container (hidden by default) -->
-    <section class="comments-container hidden mt-2">
+  <!-- Inline comments container (always visible) -->
+  <section class="comments-container mt-2">
       <div class="comments-list flex flex-col gap-2 text-sm"></div>
     </section>
     <!-- Comment input is always visible; comments list toggles above -->
@@ -85,7 +85,7 @@ export function PostCard(post, { onLike, onOpen }) {
   const deleteBtn = el.querySelector("[data-delete]");
 
   // Comments UI elements
-  const commentsContainer = el.querySelector(".comments-container");
+  // const commentsContainer = el.querySelector(".comments-container");
   const commentsList = el.querySelector(".comments-list");
   const commentsForm = el.querySelector(".comments-form");
   const commentsTextarea = commentsForm && commentsForm.querySelector('textarea[name="comment"]');
@@ -214,19 +214,13 @@ export function PostCard(post, { onLike, onOpen }) {
 
   if (likeBtn) likeBtn.addEventListener("click", () => onLike?.(post.id));
   if (openBtn) openBtn.addEventListener("click", () => onOpen?.(post.id));
-  // Toggle inline comments when open button clicked (expand inline)
-  if (openBtn && commentsContainer) {
-    openBtn.addEventListener("click", async () => {
+  // Always load comments for the first two to be visible
+  loadComments();
+  if (openBtn) {
+    openBtn.addEventListener("click", () => {
       if (onOpen) onOpen(post.id);
-      if (commentsContainer.classList.contains("hidden")) {
-        commentsContainer.classList.remove("hidden");
-        await loadComments();
-        // Reset to only show two comments when opening
-        showingAllComments = false;
-        renderComments();
-      } else {
-        commentsContainer.classList.add("hidden");
-      }
+      // Optionally, could scroll to comments or focus input
+      commentsTextarea?.focus();
     });
   }
   if (deleteBtn) {
