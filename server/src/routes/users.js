@@ -107,7 +107,15 @@ router.get("/:username", async (req, res, next) => {
 
     if (!user) return res.status(404).json({ error: { message: "user not found" } });
 
-    return res.json({ user });
+    // Compute follower and following counts (only count ACCEPTED follows)
+    const followerCount = await prisma.follow.count({
+      where: { followeeId: user.id, status: "ACCEPTED" },
+    });
+    const followingCount = await prisma.follow.count({
+      where: { followerId: user.id, status: "ACCEPTED" },
+    });
+
+    return res.json({ user: { ...user, followerCount, followingCount } });
   } catch (err) {
     return next(err);
   }

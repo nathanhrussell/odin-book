@@ -26,6 +26,7 @@ export async function ProfileView({ username } = {}) {
       <div id="profile-username" class="text-sm text-gray-500"><a href="#/profile/${encodeURIComponent(
         username
       )}" class="text-sm text-gray-500 hover:underline">@${username}</a></div>
+      <div id="profile-counts" class="text-sm text-gray-600 mt-1">Followers: <span id="follower-count">0</span> · Following: <span id="following-count">0</span></div>
       <div id="profile-bio" class="text-sm text-gray-700 mt-1"></div>
     </div>
   `;
@@ -286,6 +287,41 @@ export async function ProfileView({ username } = {}) {
   // Track if we're viewing our own profile
   let isOwnProfile = false;
 
+  // Load follower/following counts for this profile
+  async function loadProfileCounts() {
+    try {
+      // If viewing own profile, auth.me already includes counts; otherwise request public user
+      const counts = { followerCount: 0, followingCount: 0 };
+      if (isOwnProfile) {
+        try {
+          const meResp = await auth.me();
+          const meUser = meResp && meResp.user;
+          counts.followerCount = meUser && meUser.followerCount ? meUser.followerCount : 0;
+          counts.followingCount = meUser && meUser.followingCount ? meUser.followingCount : 0;
+        } catch (e) {
+          // ignore
+        }
+      } else {
+        try {
+          const userResp = await users.get(username);
+          if (userResp) {
+            counts.followerCount = userResp.followerCount || 0;
+            counts.followingCount = userResp.followingCount || 0;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      const followerEl = header.querySelector("#follower-count");
+      const followingEl = header.querySelector("#following-count");
+      if (followerEl) followerEl.textContent = String(counts.followerCount || 0);
+      if (followingEl) followingEl.textContent = String(counts.followingCount || 0);
+    } catch (err) {
+      // ignore
+    }
+  }
+
   // Try to set avatar from current session (if viewing your own profile)
   try {
     const meResp = await auth.me();
@@ -352,7 +388,9 @@ export async function ProfileView({ username } = {}) {
                 targetUser.followStatus = "ACCEPTED";
                 showToast("Followed successfully.");
               }
-              updateFollowButton();
+              // Refresh follow button state and counts
+              await updateFollowButton();
+              await loadProfileCounts();
             } catch (err) {
               console.error("Follow/unfollow action failed", err);
               showToast("An error occurred. Please try again.");
@@ -367,6 +405,9 @@ export async function ProfileView({ username } = {}) {
 
   header.appendChild(followBtn);
   updateFollowButton();
+
+  // (counts loader defined earlier) - initial call
+  loadProfileCounts();
 
   try {
     const resp = await apiPosts.list();
