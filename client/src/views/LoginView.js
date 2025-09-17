@@ -82,8 +82,8 @@ export function LoginView() {
       } catch (e) {
         // ignore
       }
-      // On success navigate to feed
-      navigate("/feed");
+      // On success navigate to posts index
+      navigate("/posts");
     } catch (err) {
       // Show error inline, not as alert
       errBox.textContent = (err && err.message) || "Login failed";

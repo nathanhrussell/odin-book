@@ -20,6 +20,70 @@ addRoute("/signup", {
   },
 });
 
+// Posts index (primary home for signed-in users)
+addRoute("/posts", {
+  requiresAuth: true,
+  render: async () => {
+    // Reuse the feed renderer logic by calling the /feed renderer
+    // Find the route for /feed and invoke its render function if present
+    const feedRoute = null; // placeholder to keep structure clear
+    // We'll just duplicate the same rendering logic as /feed below for simplicity
+    const container = document.createElement("div");
+    container.appendChild(TopNav({ onLogoClick: () => navigate("/posts") }));
+
+    const loading = LoadingNode();
+    container.appendChild(loading);
+
+    try {
+      const resp = await api.feed.list();
+      const posts = resp.posts || [];
+      container.removeChild(loading);
+
+      if (!posts.length) {
+        container.appendChild(EmptyNode("No posts yet"));
+      }
+
+      const feedNode = FeedView({
+        posts,
+        onLike: async (id) => {
+          try {
+            return await api.likes.toggle(id);
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Like failed", e);
+            throw e;
+          }
+        },
+        onOpen: (id) => console.log("open", id),
+        onCreate: async (content) => {
+          try {
+            const res = await api.posts.create({ body: content });
+            return res.post || null;
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Create post failed", e);
+            return null;
+          }
+        },
+      });
+      container.appendChild(feedNode);
+
+      const newPostBtn = container.querySelector("#new-post");
+      const composerTextarea = container.querySelector("#content");
+      if (newPostBtn && composerTextarea) {
+        newPostBtn.addEventListener("click", () => composerTextarea.focus());
+      }
+    } catch (err) {
+      container.removeChild(loading);
+      // eslint-disable-next-line no-console
+      console.error("Failed to load posts:", err);
+      container.appendChild(ErrorNode((err && err.message) || "Failed to load posts"));
+    }
+
+    return container;
+  },
+});
+
 initTheme();
 // Preload current user session (optional) so UI can use cached value
 fetchCurrentUser().catch(() => {});
@@ -31,7 +95,7 @@ addRoute("/feed", {
   requiresAuth: true,
   render: async () => {
     const container = document.createElement("div");
-    container.appendChild(TopNav({ onLogoClick: () => navigate("/feed") }));
+    container.appendChild(TopNav({ onLogoClick: () => navigate("/posts") }));
 
     // Show loading state while fetching feed
     const loading = LoadingNode();

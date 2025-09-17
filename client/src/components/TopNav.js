@@ -38,6 +38,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
           </button>
         </div>
         <nav class="flex items-center gap-3">
+          <button id="posts" class="btn btn-ghost text-sm" aria-label="Posts">Posts</button>
           <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
           <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
         </nav>
@@ -68,8 +69,10 @@ export function TopNav({ onLogoClick, onProfileClick }) {
     try {
       const hash = (location.hash || "").replace(/^#/, "");
       const onFeed = hash.startsWith("/feed");
+      const onPosts = hash.startsWith("/posts") || hash === "/" || hash === "";
       const onProfile = hash.startsWith("/profile");
       const newPostBtn = el.querySelector("#new-post");
+      const postsBtn = el.querySelector("#posts");
       const profileBtn = el.querySelector("#profile");
 
       if (newPostBtn) {
@@ -79,6 +82,16 @@ export function TopNav({ onLogoClick, onProfileClick }) {
         } else {
           newPostBtn.classList.remove("btn-primary");
           newPostBtn.classList.add("btn-ghost");
+        }
+      }
+
+      if (postsBtn) {
+        if (onPosts) {
+          postsBtn.classList.add("btn-primary");
+          postsBtn.classList.remove("btn-ghost");
+        } else {
+          postsBtn.classList.remove("btn-primary");
+          postsBtn.classList.add("btn-ghost");
         }
       }
 
@@ -171,7 +184,16 @@ export function TopNav({ onLogoClick, onProfileClick }) {
 
     // Basic handlers for current DOM
     const homeBtn = el.querySelector("button[aria-label='Home']");
-    if (homeBtn) homeBtn.addEventListener("click", () => onLogoClick?.());
+    if (homeBtn)
+      homeBtn.addEventListener("click", () => {
+        if (typeof onLogoClick === "function") return onLogoClick();
+        navigate("/posts");
+      });
+
+    const postsBtn = el.querySelector("#posts");
+    if (postsBtn) {
+      postsBtn.addEventListener("click", () => navigate("/posts"));
+    }
 
     const profileBtn = el.querySelector("#profile");
     if (profileBtn) {
@@ -229,7 +251,8 @@ export function TopNav({ onLogoClick, onProfileClick }) {
         } catch (e) {
           // ignore
         }
-        navigate("/feed");
+        // Prefer focusing the composer on the posts index if present, otherwise feed
+        navigate("/posts");
         return undefined;
       });
     }

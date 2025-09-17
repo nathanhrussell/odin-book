@@ -46,7 +46,7 @@ export async function navigate(path) {
 }
 
 export async function handleHashChange(container) {
-  const hash = location.hash || "#/feed";
+  const hash = location.hash || "#/posts";
   const matched = matchRoute(hash);
   if (!matched) {
     renderNotFound(container);
