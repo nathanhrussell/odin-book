@@ -176,14 +176,28 @@ button:focus-visible {
 @media (prefers-color-scheme: dark) {
   /* If a logout button is styled with text-red-600 (e.g. via class on TopNav), ensure it's visible */
   .btn-ghost.text-red-600,
-  button.btn-ghost.text-red-600 {
-    color: #ef4444; /* matches Tailwind text-red-500/600 family */
+  button.btn-ghost.text-red-600,
+  .text-red-600,
+  button.text-red-600,
+  a.text-red-600,
+  [data-logout],
+  button[data-logout],
+  a[data-logout] {
+    color: #ef4444 !important; /* matches Tailwind text-red-500/600 family */
   }
-  /* ensure hover state keeps clear contrast */
+  /* ensure hover state keeps clear contrast and overrides hover:bg-red-50 in dark mode */
   .btn-ghost.text-red-600:hover,
-  button.btn-ghost.text-red-600:hover {
-    background-color: rgba(255, 0, 0, 0.04);
-    color: #ff6b6b;
+  button.btn-ghost.text-red-600:hover,
+  .text-red-600:hover,
+  button.text-red-600:hover,
+  a.text-red-600:hover,
+  [data-logout]:hover,
+  button[data-logout]:hover,
+  a[data-logout]:hover,
+  .btn-ghost.text-red-600.hover\:bg-red-50:hover,
+  button.btn-ghost.text-red-600.hover\:bg-red-50:hover {
+    background-color: rgba(239, 68, 68, 0.1) !important; /* red with opacity for dark mode */
+    color: #ff6b6b !important;
   }
 }
 

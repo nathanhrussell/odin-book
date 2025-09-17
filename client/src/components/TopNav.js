@@ -137,7 +137,14 @@ export function TopNav({ onLogoClick, onProfileClick }) {
     const right = el.querySelector("nav");
     if (cached && cached.username) {
       // Red logout button
-      authBtn.className = "btn btn-ghost text-sm text-red-600 hover:bg-red-50";
+      authBtn.className = "btn btn-ghost text-sm";
+      authBtn.style.color = "#ef4444"; // Force red color directly
+      authBtn.addEventListener("mouseenter", () => {
+        authBtn.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+      });
+      authBtn.addEventListener("mouseleave", () => {
+        authBtn.style.backgroundColor = "";
+      });
       authBtn.textContent = "Logout";
       authBtn.addEventListener("click", async () => {
         try {
