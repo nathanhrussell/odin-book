@@ -113,8 +113,51 @@ export function PostCard(post, { onLike, onOpen }) {
           )} · <span class="ml-1">${new Date(comment.createdAt).toLocaleString()}</span></div>
           <div class="mt-1 text-sm">${escapeHtml(comment.body)}</div>
         </div>
+        <div class="ml-2 self-start">
+          ${
+            session.getCurrentUserSync &&
+            session.getCurrentUserSync()?.id === (comment.author && comment.author.id)
+              ? '<button class="btn btn-ghost text-red-400" data-comment-delete>🗑</button>'
+              : ""
+          }
+        </div>
       </div>
     `;
+    // Attach delete handler if button exists
+    const delBtn = node.querySelector("[data-comment-delete]");
+    if (delBtn) {
+      delBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        // Confirm
+        const ok = await showConfirm("Delete this comment? This cannot be undone.");
+        if (!ok) return;
+        try {
+          delBtn.disabled = true;
+          // Prefer local import, fall back to window.api
+          let delFn = null;
+          if (apiComments && apiComments.delete) delFn = apiComments.delete;
+          else if (window.api && window.api.comments && window.api.comments.delete)
+            delFn = window.api.comments.delete;
+          if (!delFn) throw new Error("Delete API not available");
+          await delFn(comment.id);
+          // remove node from DOM
+          if (node && node.parentElement) node.parentElement.removeChild(node);
+          // decrement comment count badge on the parent post card
+          const postCard = el; // closure captures post card element
+          const badge = postCard.querySelector("[data-open] span");
+          if (badge) {
+            const n = parseInt(badge.textContent || "0", 10) || 0;
+            badge.textContent = String(Math.max(0, n - 1));
+          }
+          showToast("Comment deleted");
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error("Failed to delete comment", err);
+          showToast((err && err.message) || "Failed to delete comment");
+          if (delBtn) delBtn.disabled = false;
+        }
+      });
+    }
     return node;
   }
 

@@ -109,6 +109,7 @@ export const comments = {
   list: (postId) =>
     fetchJson(`/api/comments?postId=${postId}`, { method: "GET" }).then((r) => r.comments || []),
   create: (postId, body) => fetchJson("/api/comments", { method: "POST", body: { postId, body } }),
+  delete: (id) => fetchJson(`/api/comments/${id}`, { method: "DELETE" }),
 };
 
 // Users

@@ -40,4 +40,22 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// Protected: delete a comment (only by comment author)
+router.delete("/:id", requireAuth, async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (!id) return res.status(400).json({ error: { message: "Invalid comment id" } });
+
+    const existing = await prisma.comment.findUnique({ where: { id } });
+    if (!existing) return res.status(404).json({ error: { message: "Comment not found" } });
+    if (existing.authorId !== req.user.id)
+      return res.status(403).json({ error: { message: "Not authorized" } });
+
+    await prisma.comment.delete({ where: { id } });
+    return res.json({ success: true });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 module.exports = router;
