@@ -38,8 +38,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
           </button>
         </div>
         <nav class="flex items-center gap-3">
-          <button id="posts" class="btn btn-ghost text-sm" aria-label="Posts">Posts</button>
-          <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
+          <button id="posts" class="btn btn-primary text-sm" aria-label="View posts">Posts</button>
           <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
         </nav>
       </div>
@@ -57,7 +56,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
           </button>
         </div>
         <nav class="flex items-center gap-3">
-          <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
+          <button id="posts" class="btn btn-primary text-sm" aria-label="View posts">Posts</button>
           <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
         </nav>
       </div>
@@ -162,7 +161,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
           <div class="flex items-center gap-3"></div>
           <nav class="flex items-center gap-3">
             <!-- theme + auth inserted below -->
-            <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
+            <button id="posts" class="btn btn-primary text-sm" aria-label="View posts">Posts</button>
             <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
           </nav>
         </div>
@@ -175,7 +174,7 @@ export function TopNav({ onLogoClick, onProfileClick }) {
   <div class="mx-auto max-w-4xl px-6 h-16 flex items-center justify-between bg-transparent">
           <div class="flex items-center gap-3"></div>
           <nav class="flex items-center gap-3">
-            <button id="new-post" class="btn btn-primary text-sm" aria-label="Create new post">New Post</button>
+            <button id="posts" class="btn btn-primary text-sm" aria-label="View posts">Posts</button>
             <button id="profile" class="btn btn-ghost text-sm" aria-label="Open profile">Profile</button>
           </nav>
         </div>
