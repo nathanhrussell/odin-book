@@ -85,10 +85,23 @@ export function PostCard(post, { onLike, onOpen }) {
   const deleteBtn = el.querySelector("[data-delete]");
 
   // Comments UI elements
-  // const commentsContainer = el.querySelector(".comments-container");
   const commentsList = el.querySelector(".comments-list");
   const commentsForm = el.querySelector(".comments-form");
   const commentsTextarea = commentsForm && commentsForm.querySelector('textarea[name="comment"]');
+  const commentAvatar = commentsForm && commentsForm.querySelector(".comment-avatar");
+
+  // Set the comment box avatar to the current user's avatar
+  if (commentAvatar) {
+    let user = null;
+    try {
+      user = session.getCurrentUserSync ? session.getCurrentUserSync() : null;
+    } catch (e) {
+      user = null;
+    }
+    commentAvatar.src = avatarSrc(user && (user.avatarUrl || user.avatar));
+    commentAvatar.alt =
+      user && (user.name || user.username) ? `${user.name || user.username} avatar` : "Your avatar";
+  }
 
   // State: whether we've loaded comments yet
   let commentsLoaded = false;
