@@ -270,10 +270,13 @@ button:focus-visible {
 
   /* Allow top nav items to wrap/scroll horizontally when space is constrained */
   header nav {
-    flex-wrap: nowrap;
+    /* Prefer wrapping so action buttons (eg. Logout) can move to the next line instead of being hidden
+       on very small devices. Keep horizontal scroll as a fallback for single-row designs. */
+    flex-wrap: wrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     gap: 0.5rem;
+    align-items: center;
   }
   header nav::-webkit-scrollbar {
     height: 6px;
@@ -299,6 +302,30 @@ button:focus-visible {
   }
 }
 
+/* Very small phones: compress nav so items fit on one line where possible
+   (reduce gap, shrink button padding and font-size, and prefer nowrap). */
+@media (max-width: 420px) {
+  header nav {
+    gap: 0.25rem;
+    flex-wrap: nowrap; /* try to keep nav on one row */
+    overflow-x: auto;
+  }
+
+  /* Slightly smaller, tighter nav buttons to gain horizontal space */
+  header nav .btn,
+  header nav button {
+    padding: 0.35em 0.6em;
+    font-size: 0.9rem;
+    border-radius: 999px; /* keep pill shape but slightly smaller */
+  }
+
+  /* Reduce left/right spacing of the nav container so more room is available */
+  .mx-auto.max-w-4xl.px-6 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
 @media (min-width: 641px) and (max-width: 1024px) {
   /* Tablet adjustments: preserve desktop feel but reduce some padding */
   :root {
@@ -318,6 +345,30 @@ button:focus-visible {
      feels balanced on tablets */
   .mx-auto.max-w-4xl {
     max-width: 1100px;
+  }
+}
+
+/* Prevent sticky header from overlapping or clipping content on taller tablet viewports
+   by increasing the header's bottom padding and ensuring the brand banner does not
+   push the sticky area outside the viewport. This addresses the logout button being
+   cut off at the bottom on some tablets. */
+@media (min-width: 700px) and (max-width: 1200px) {
+  header.sticky {
+    /* add a small extra bottom padding so rounded buttons aren't clipped */
+    padding-bottom: 0.5rem;
+  }
+
+  /* When the signed-in large logo banner is present, ensure its negative margin doesn't
+     push the main sticky header out of view on some browsers. Use a safe top margin on
+     the following content to keep the sticky header fully visible. */
+  header + * {
+    margin-top: 0.25rem;
+  }
+
+  /* Ensure the auth button keeps its intrinsic size and doesn't overflow/clip */
+  #auth-btn {
+    white-space: nowrap;
+    flex: 0 0 auto;
   }
 }
 
