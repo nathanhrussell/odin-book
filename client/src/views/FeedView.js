@@ -81,6 +81,19 @@ export function PostCard(post, { onLike, onOpen }) {
   `;
 
   const likeBtn = el.querySelector("[data-like]");
+  let liked = false;
+  let likeCount = post.likesCount ?? 0;
+  // Optionally, you could pass liked state from the API if available
+
+  // Helper to update like button UI
+  function updateLikeBtn() {
+    if (!likeBtn) return;
+    likeBtn.innerHTML = `${
+      liked ? '<span style="color:#a855f7">♥</span>' : "♡"
+    } <span>${likeCount}</span>`;
+    likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
+  }
+  updateLikeBtn();
   const openBtn = el.querySelector("[data-open]");
   const deleteBtn = el.querySelector("[data-delete]");
 
@@ -225,7 +238,30 @@ export function PostCard(post, { onLike, onOpen }) {
     }
   }
 
-  if (likeBtn) likeBtn.addEventListener("click", () => onLike?.(post.id));
+  if (likeBtn) {
+    likeBtn.addEventListener("click", async () => {
+      if (typeof onLike === "function") {
+        try {
+          // Optimistically toggle like state
+          liked = !liked;
+          likeCount += liked ? 1 : -1;
+          updateLikeBtn();
+          // Call the handler (which should call the API)
+          const result = await onLike(post.id);
+          // If the API returns the real like state/count, update accordingly
+          if (result && typeof result.liked === "boolean") liked = result.liked;
+          if (result && typeof result.likeCount === "number") likeCount = result.likeCount;
+          updateLikeBtn();
+        } catch (e) {
+          // Rollback UI if API call fails
+          liked = !liked;
+          likeCount += liked ? 1 : -1;
+          updateLikeBtn();
+          showToast((e && e.message) || "Failed to like post");
+        }
+      }
+    });
+  }
   if (openBtn) openBtn.addEventListener("click", () => onOpen?.(post.id));
   // Always load comments for the first two to be visible
   loadComments();
