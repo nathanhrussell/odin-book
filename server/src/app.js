@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const errorHandler = require("./middleware/error.js");
 
@@ -15,6 +16,19 @@ app.use((req, res, next) => {
 // Body parsing and cookies
 app.use(express.json());
 app.use(cookieParser());
+
+// Serve client static files in production when building a single deploy
+if (process.env.NODE_ENV === "production") {
+  const clientDist = path.join(__dirname, "..", "..", "client", "dist");
+  // Serve static assets
+  app.use(express.static(clientDist));
+
+  // Fallback to index.html for SPA routes, but don't intercept API routes
+  app.get("*", (req, res, next) => {
+    if (req.originalUrl.startsWith("/api/")) return next();
+    return res.sendFile(path.join(clientDist, "index.html"));
+  });
+}
 
 // Simple CORS middleware - allow credentials and origin from env
 app.use((req, res, next) => {
