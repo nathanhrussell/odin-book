@@ -8,8 +8,19 @@
 const API_BASE =
   import.meta.env.VITE_API_ORIGIN || (import.meta.env.DEV ? "http://localhost:3000" : "");
 
+function joinUrl(base, path) {
+  if (!base) return path;
+  if (base.endsWith("/") && path.startsWith("/")) {
+    return `${base}${path.slice(1)}`;
+  }
+  if (!base.endsWith("/") && !path.startsWith("/")) {
+    return `${base}/${path}`;
+  }
+  return `${base}${path}`;
+}
+
 async function fetchJson(path, opts = {}) {
-  const url = `${API_BASE}${path}`;
+  const url = joinUrl(API_BASE, path);
   const options = {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -44,7 +55,7 @@ async function fetchJson(path, opts = {}) {
 
 // Helper for multipart form uploads (no JSON encoding, leaves Content-Type unset)
 async function uploadForm(path, formData, opts = {}) {
-  const url = `${API_BASE}${path}`;
+  const url = joinUrl(API_BASE, path);
   const options = {
     method: opts.method || "POST",
     credentials: "include",
