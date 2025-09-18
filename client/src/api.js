@@ -1,7 +1,12 @@
 // Minimal API layer for client
 // Uses fetch with credentials to include cookies (access/refresh tokens).
 
-const API_BASE = import.meta.env.VITE_API_ORIGIN || "http://localhost:3000";
+// In development you may want to call a local API server. When building for
+// production (serving client and server from the same origin) prefer a
+// relative path so the browser talks to the same host that served the app.
+// VITE_API_ORIGIN can still be used to override the base URL if needed.
+const API_BASE =
+  import.meta.env.VITE_API_ORIGIN || (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 async function fetchJson(path, opts = {}) {
   const url = `${API_BASE}${path}`;
